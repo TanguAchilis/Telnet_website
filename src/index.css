@@ -1,0 +1,450 @@
+/* ============================================
+   TELNET CAMEROON — Global Design System
+   Refined Orange & Warm White Edition
+   ============================================ */
+
+/* --- CSS Custom Properties --- */
+:root {
+  /* Colors — Refined Brand Palette */
+  --color-primary: #fcfaf7;
+  --color-primary-light: #f6f1eb;
+  --color-primary-lighter: #efe7de;
+  --color-surface: #fffdfa;
+  --color-surface-soft: #f8f3ed;
+  --color-accent: #e8673c;
+  --color-accent-dark: #c24d22;
+  --color-accent-light: #f08a60;
+  --color-accent-glow: rgba(232, 103, 60, 0.07);
+  --color-accent-glow-strong: rgba(232, 103, 60, 0.14);
+  --color-white: #ffffff;
+  --color-gray-100: #f2ede7;
+  --color-gray-200: #e3dbd1;
+  --color-gray-300: #cdc2b6;
+  --color-gray-400: #aa9d90;
+  --color-gray-500: #796d62;
+  --color-gray-600: #5b5148;
+  --color-text: #1f1a16;
+  --color-text-secondary: #665d56;
+  --color-dark: #1f1a16;
+  --color-on-dark: #fff7f1;
+  --color-on-dark-muted: rgba(255, 247, 241, 0.72);
+  --color-footer-bg: #e8673c;
+  --color-danger: #c0392b;
+  --color-warning: #d4a017;
+  --color-success: #2e7d52;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Secondary accent */
+  --color-secondary: #d45a2e;
+  --color-warm-rose: rgba(232, 103, 60, 0.05);
+
+  /* Typography */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 24px rgba(232, 103, 60, 0.08);
+  --shadow-glow-strong: 0 0 48px rgba(232, 103, 60, 0.14);
+  --shadow-warm: 0 10px 28px rgba(232, 103, 60, 0.06);
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Card / Glass */
+  --glass-bg: rgba(255, 253, 250, 0.9);
+  --glass-border: rgba(31, 26, 22, 0.07);
+  --glass-border-hover: rgba(232, 103, 60, 0.18);
+  --glass-border-glow: rgba(232, 103, 60, 0.22);
+  --glass-blur: blur(24px);
+
+  /* Layout */
+  --max-width: 1200px;
+  --nav-height: 76px;
+}
+
+/* --- Reset & Base --- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  line-height: 1.75;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  min-height: 100vh;
+  letter-spacing: 0.01em;
+}
+
+/* Subtle ambient accent glow */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(160px);
+  z-index: -1;
+  opacity: 0.04;
+  animation: floatAmbient 25s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+body::before {
+  top: -15%;
+  left: -15%;
+  width: 55vw;
+  height: 55vw;
+  background: var(--color-accent);
+}
+
+body::after {
+  bottom: -15%;
+  right: -15%;
+  width: 60vw;
+  height: 60vw;
+  background: var(--color-accent-light);
+  animation-delay: -12s;
+}
+
+@keyframes floatAmbient {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(4%, 4%) scale(1.05);
+  }
+
+  100% {
+    transform: translate(-4%, -4%) scale(0.95);
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  color: var(--color-dark);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--transition-fast);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* --- Utility Classes --- */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-md);
+  }
+}
+
+.section {
+  padding: var(--space-4xl) 0;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-md);
+  position: relative;
+}
+
+.section-label::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: var(--color-dark);
+  letter-spacing: -0.3px;
+}
+
+/* Accent text utility */
+.text-gradient-accent {
+  color: var(--color-accent);
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  color: var(--color-text-secondary);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-full);
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.4px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn:hover::before {
+  opacity: 1;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+  color: var(--color-on-dark);
+  box-shadow: 0 4px 16px rgba(232, 103, 60, 0.18);
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 103, 60, 0.24);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1.5px solid rgba(232, 103, 60, 0.3);
+}
+
+.btn-secondary:hover {
+  background: var(--color-accent-glow);
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+/* --- Glass Card — Warm Luxury Edition --- */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  transition: all var(--transition-base);
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-warm), var(--shadow-glow);
+  transform: translateY(-4px);
+}
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(232, 103, 60, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 18px rgba(232, 103, 60, 0.18);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* --- Selection --- */
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}

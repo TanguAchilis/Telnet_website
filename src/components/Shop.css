@@ -1,0 +1,129 @@
+.shop-section {
+    background: var(--color-primary);
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+    margin-bottom: var(--space-3xl);
+}
+
+.shop-card {
+    padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--glass-border);
+    border-top: 2px solid rgba(200, 96, 28, 0.08);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-card:hover {
+    transform: translateY(-6px);
+    border-top-color: var(--color-accent);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), var(--shadow-warm);
+}
+
+.shop-emoji {
+    font-size: 2rem;
+    margin-bottom: var(--space-lg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: rgba(200, 96, 28, 0.04);
+    border: 1px solid rgba(200, 96, 28, 0.08);
+    border-radius: 50%;
+    box-shadow: inset 0 0 12px rgba(200, 96, 28, 0.03);
+    transition: all var(--transition-base);
+}
+
+.shop-card:hover .shop-emoji {
+    transform: scale(1.1);
+    background: var(--color-accent-glow);
+    border-color: rgba(200, 96, 28, 0.2);
+    box-shadow: 0 0 16px rgba(200, 96, 28, 0.08);
+}
+
+.shop-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.shop-card-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    flex: 1;
+    margin-bottom: var(--space-lg);
+}
+
+.shop-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--glass-border);
+}
+
+.shop-price {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.shop-inquiry-btn {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    background: var(--color-accent-glow);
+    border: 1px solid transparent;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+}
+
+.shop-inquiry-btn:hover {
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 0 14px rgba(200, 96, 28, 0.15);
+    transform: translateY(-2px);
+}
+
+/* CTA */
+.shop-cta {
+    text-align: center;
+    padding: var(--space-2xl);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+}
+
+.shop-cta-text {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .shop-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .shop-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .shop-card {
+        padding: var(--space-xl);
+    }
+}

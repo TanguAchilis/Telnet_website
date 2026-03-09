@@ -1,0 +1,112 @@
+.team-section {
+    background: var(--color-primary);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+}
+
+.team-card {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-spring);
+    position: relative;
+}
+
+.team-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--glass-border-hover);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1), var(--shadow-glow);
+}
+
+.team-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+}
+
+.team-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-card:hover .team-image {
+    transform: scale(1.08);
+}
+
+.team-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #fff, transparent 65%);
+    opacity: 0.9;
+}
+
+.team-info {
+    padding: var(--space-lg) var(--space-xl) var(--space-xl);
+    text-align: center;
+    margin-top: -30px;
+    position: relative;
+    transition: transform var(--transition-base);
+}
+
+.team-card:hover .team-info {
+    transform: translateY(-5px);
+}
+
+.team-role-badge {
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    background: rgba(200, 96, 28, 0.06);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(200, 96, 28, 0.15);
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: var(--space-md);
+    transition: all var(--transition-base);
+}
+
+.team-card:hover .team-role-badge {
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(200, 96, 28, 0.15);
+}
+
+.team-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+}
+
+.team-title {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        max-width: 360px;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md);
+    }
+}
