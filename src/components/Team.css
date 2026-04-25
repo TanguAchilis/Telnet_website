@@ -95,6 +95,38 @@
     color: var(--color-text-secondary);
 }
 
+/* Volunteers */
+.team-volunteers {
+    margin-top: var(--space-xl);
+    display: flex;
+    justify-content: center;
+}
+
+.volunteer-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    border-radius: var(--radius-xl);
+    max-width: 480px;
+}
+
+.volunteer-icon {
+    font-size: 2rem;
+}
+
+.volunteer-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.volunteer-text {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .team-grid {

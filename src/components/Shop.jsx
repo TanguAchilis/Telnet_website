@@ -55,7 +55,7 @@ export default function Shop({ showHeader = true }) {
                         <span className="section-label">Our Products</span>
                         <h2 className="section-title"><span className="text-gradient-accent">Shop</span></h2>
                         <p className="section-subtitle">
-                            Quality laptops and accessories from trusted brands — HP, Dell, Lenovo, Acer and more.
+                            Go through our collection of quality laptops and accessories suitable for professionals, school and personal use. We offer devices from trusted brands like HP, Dell, Lenovo, Acer and more.
                         </p>
                     </div>
                 )}
@@ -83,7 +83,7 @@ export default function Shop({ showHeader = true }) {
 
                 <div className="shop-cta animate-on-scroll">
                     <p className="shop-cta-text">
-                        All products come with reliable support and guidance to help you choose the right device.
+                        All products come with reliable support and guidance to help you choose the right devices for your needs.
                     </p>
                     <a
                         href={getWhatsAppUrl(whatsappMessages.general)}

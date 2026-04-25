@@ -7,8 +7,8 @@ const slides = [
     {
         image: '/Our team/other images/training sesseions.jpg',
         badge: '🚀 Trusted by Schools, Homes & Businesses',
-        title: <>Reliable Technology<br />Solutions for <span className="hero-highlight">Everyone</span></>,
-        desc: 'TELNET CAMEROON is dedicated to providing quality and reliable digital solutions — helping individuals and businesses stay connected and productive across Cameroon and beyond.',
+        title: <>Reliable Technology<br />Solutions for <span className="hero-highlight">School, Home & Businesses</span></>,
+        desc: 'TELNET CAMEROON is a company dedicated to providing quality and reliable digital solutions and to help individuals and businesses stay connected and productive.',
         cta: { label: 'Explore Services', to: '/services' },
     },
     {
@@ -23,7 +23,7 @@ const slides = [
         badge: '🎓 Hands-On Learning Programs',
         title: <>Empowering the Next<br />Generation of <span className="hero-highlight">Tech Leaders</span></>,
         desc: 'Our training and internship programs equip young professionals with practical skills in networking, hardware maintenance, web development, and more.',
-        cta: { label: 'Meet the Team', to: '/team' },
+        cta: { label: 'Apply for Internship', to: '/internship' },
     },
     {
         image: '/Our team/other images/laptop.jpg',

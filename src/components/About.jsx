@@ -39,7 +39,7 @@ export default function About({ showHeader = true }) {
                         <p className="about-card-text">
                             To empower communities through ICT and become the leading technology solutions provider
                             known for reliability and excellence in digital services and training. We strive to build
-                            a future where technology improves security, productivity and opportunities.
+                            a future where technology improves security, productivity and opportunities in our community.
                         </p>
                     </div>
                 </div>

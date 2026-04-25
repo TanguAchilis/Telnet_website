@@ -1,3 +1,38 @@
 .home-team-preview {
     /* handled by Team component styles */
 }
+
+/* What We Do Section */
+.what-we-do-section {
+    padding: 3rem 0 1rem;
+}
+
+.what-we-do-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.what-we-do-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: transform 0.2s;
+}
+
+.what-we-do-item:hover {
+    transform: translateY(-2px);
+}
+
+.what-we-do-icon {
+    font-size: 1.2rem;
+}
+
+.what-we-do-label {
+    white-space: nowrap;
+}

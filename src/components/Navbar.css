@@ -237,6 +237,12 @@
     transition-delay: 0.38s;
 }
 
+.mobile-menu.open .mobile-nav-item:nth-child(8) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.43s;
+}
+
 .mobile-nav-link {
     display: flex;
     align-items: center;

@@ -38,6 +38,7 @@ export default function Footer() {
                             <li><Link to="/about">About Us</Link></li>
                             <li><Link to="/team">Our Team</Link></li>
                             <li><Link to="/gallery">Gallery</Link></li>
+                            <li><Link to="/internship">Internship</Link></li>
                         </ul>
                     </div>
 
@@ -45,9 +46,10 @@ export default function Footer() {
                         <h4>Services</h4>
                         <ul>
                             <li><Link to="/shop">Laptop Sales</Link></li>
-                            <li><Link to="/services">CCTV Installation</Link></li>
+                            <li><Link to="/services">Security Camera Installation</Link></li>
                             <li><Link to="/services">Internet Setup</Link></li>
                             <li><Link to="/services">Tech Training</Link></li>
+                            <li><Link to="/internship">Internship Program</Link></li>
                         </ul>
                     </div>
 
@@ -64,7 +66,7 @@ export default function Footer() {
                             </li>
                             <li>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                                Molyko-Buea, Cameroon
+                                Tarred Malingo, behind Amazing Pharmacy, Molyko-Buea / St Claire
                             </li>
                             <li>
                                 <a

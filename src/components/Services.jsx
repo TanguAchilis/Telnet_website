@@ -9,7 +9,7 @@ const services = [
             </svg>
         ),
         title: 'Laptop Sales',
-        desc: 'High-quality laptops and accessories from trusted brands like HP, Dell, Lenovo — suitable for students, professionals, and businesses.',
+        desc: 'We provide high-quality laptops and accessories suitable for students, professionals, and businesses. Our products come from trusted brands like HP, Dell, Lenovo and more.',
         features: ['Brand New & Refurbished', 'All Accessories', 'Warranty Support'],
         whatsappKey: 'laptopSales',
     },
@@ -19,8 +19,8 @@ const services = [
                 <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" /><circle cx="12" cy="13" r="4" />
             </svg>
         ),
-        title: 'CCTV Installation',
-        desc: 'Protect your property with reliable, modern surveillance systems installed by certified professionals.',
+        title: 'Security Camera Installation',
+        desc: 'Protect your property with reliable surveillance systems. We install modern CCTV solutions from trusted brands for homes, offices, and businesses.',
         features: ['HD & IP Cameras', 'Remote Monitoring', '24/7 Recording'],
         whatsappKey: 'cctv',
     },
@@ -31,7 +31,7 @@ const services = [
             </svg>
         ),
         title: 'Internet Installation',
-        desc: 'High-speed satellite internet using Starlink technology — reliable connectivity even in remote areas.',
+        desc: 'We install and configure high-speed satellite internet using Starlink technology to ensure reliable connectivity even in remote areas.',
         features: ['Starlink Setup', 'Wi-Fi Configuration', 'Network Optimization'],
         whatsappKey: 'internet',
     },
@@ -42,8 +42,8 @@ const services = [
             </svg>
         ),
         title: 'Tech Training',
-        desc: 'Practical technology skills training including networking, CCTV installation, graphic design, and web development.',
-        features: ['Hands-on Practice', 'Certification', 'Internship Program'],
+        desc: 'Our training programs help individuals gain practical technology skills including computer fundamentals, networking, CCTV installation, graphic design, and web development.',
+        features: ['Computer Fundamentals', 'Networking & CCTV', 'Graphic Design & Web Dev'],
         whatsappKey: 'training',
     },
     {

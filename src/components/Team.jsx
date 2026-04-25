@@ -8,7 +8,7 @@ const teamMembers = [
         image: '/Our team/Taku Otto Angwa(CEO).jpeg',
     },
     {
-        name: 'Nkemetiafie Innocensia',
+        name: 'Nkemetiafie Innocencia',
         role: 'Manager',
         title: 'IT Expert & Network Engineer',
         image: '/Our team/Nkemetiafie Innocensia(Manager).jpeg',
@@ -30,7 +30,7 @@ export default function Team({ showHeader = true }) {
                         <span className="section-label">The Team</span>
                         <h2 className="section-title">Meet Our <span className="text-gradient-accent">Experts</span></h2>
                         <p className="section-subtitle">
-                            Skilled technology professionals and trainers dedicated to delivering excellence.
+                            Our team is made up of skilled technology experts and trainers dedicated to providing high quality services.
                         </p>
                     </div>
                 )}
@@ -49,6 +49,16 @@ export default function Team({ showHeader = true }) {
                             </div>
                         </div>
                     ))}
+                </div>
+
+                <div className="team-volunteers animate-on-scroll">
+                    <div className="volunteer-badge glass-card">
+                        <span className="volunteer-icon">🤝</span>
+                        <div>
+                            <h4 className="volunteer-title">Volunteers</h4>
+                            <p className="volunteer-text">Our dedicated volunteers support our mission to bridge the digital divide.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

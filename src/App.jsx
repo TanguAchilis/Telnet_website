@@ -10,6 +10,7 @@ import TeamPage from './pages/TeamPage'
 import GalleryPage from './pages/GalleryPage'
 import ShopPage from './pages/ShopPage'
 import ContactPage from './pages/ContactPage'
+import InternshipPage from './pages/InternshipPage'
 import WhatsAppFloat from './components/WhatsAppFloat'
 
 function AnimationObserver() {
@@ -61,6 +62,7 @@ function App() {
           <Route path="/team" element={<TeamPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/internship" element={<InternshipPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </main>

@@ -4,9 +4,10 @@ import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import './Navbar.css'
 
 export default function Navbar() {
-    const [isOpen, setIsOpen] = useState(false)
+    const [openMenuPathname, setOpenMenuPathname] = useState(null)
     const [scrolled, setScrolled] = useState(false)
     const location = useLocation()
+    const isOpen = openMenuPathname === location.pathname
 
     useEffect(() => {
         const handleScroll = () => {
@@ -16,10 +17,13 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    // Close menu on route change
-    useEffect(() => {
-        setIsOpen(false)
-    }, [location])
+    const toggleMenu = () => {
+        setOpenMenuPathname((current) => (current === location.pathname ? null : location.pathname))
+    }
+
+    const closeMenu = () => {
+        setOpenMenuPathname(null)
+    }
 
     const navLinks = [
         { label: 'Home', to: '/' },
@@ -28,6 +32,7 @@ export default function Navbar() {
         { label: 'Team', to: '/team' },
         { label: 'Gallery', to: '/gallery' },
         { label: 'Shop', to: '/shop' },
+        { label: 'Internship', to: '/internship' },
         { label: 'Contact', to: '/contact' },
     ]
 
@@ -67,8 +72,9 @@ export default function Navbar() {
 
                 <button
                     className={`hamburger ${isOpen ? 'active' : ''}`}
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={toggleMenu}
                     aria-label="Toggle menu"
+                    aria-expanded={isOpen}
                 >
                     <span></span>
                     <span></span>
@@ -86,7 +92,7 @@ export default function Navbar() {
                         <Link
                             to={link.to}
                             className={`mobile-nav-link ${location.pathname === link.to ? 'active' : ''}`}
-                            onClick={() => setIsOpen(false)}
+                            onClick={closeMenu}
                         >
                             <span className="mobile-nav-number">0{i + 1}</span>
                             <span className="mobile-nav-label">{link.label}</span>
