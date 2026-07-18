@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import { submitInternshipApplication } from '../utils/internshipApplications'
+import { fetchSetting } from '../utils/admin'
 import {
     academicModeValue,
     getFirstInvalidInternshipStep,
@@ -49,14 +50,13 @@ const academicLevels = [
     'Year 4',
 ]
 
-const programOptions = [
+const DEFAULT_PROGRAM_OPTIONS = [
     'Networking & Security (NWS, CSN, etc)',
     'Cyber Security (pro interns)',
     'Telecommunications',
     'Computer Graphics and Web Development',
-    'Electrical Power systems',
+    'Electrical Power Systems',
     'Software Engineering (BTech & HND)',
-    'Other',
 ]
 
 const internshipPeriods = [
@@ -69,12 +69,16 @@ const internshipPeriods = [
     'Other',
 ]
 
-const feeStructures = [
+const DEFAULT_FEE_STRUCTURES = [
     '1 Month (15,000 XAF)',
     '2 Months (20,000 XAF)',
     '3-4 Months (25,000 XAF)',
     '5-6 Months (30,000 XAF)',
 ]
+
+// Module-level cache so we don't re-fetch on every modal open
+let _feeStructuresCache = null
+let _programOptionsCache = null
 
 const paymentMethods = [
     'MOMO (671827893 taku otto)',
@@ -175,12 +179,48 @@ export default function InternshipApplication({ isOpen, onClose }) {
     const [submitStatus, setSubmitStatus] = useState({ type: 'idle', message: '' })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitted, setSubmitted] = useState(false)
+    const [feeStructures, setFeeStructures] = useState(_feeStructuresCache ?? DEFAULT_FEE_STRUCTURES)
+    const [programOptions, setProgramOptions] = useState(_programOptionsCache ?? DEFAULT_PROGRAM_OPTIONS)
 
     const isAcademicMode = formData.modeOfLearning === academicModeValue
     const isOtherProgramOption = formData.programOption === otherOptionValue
     const isOtherInternshipPeriod = formData.internshipPeriod === otherOptionValue
     const finalStepIndex = wizardSteps.length - 1
     const currentStepConfig = wizardSteps[currentStep]
+    const availableProgramOptions = programOptions.includes(otherOptionValue)
+        ? programOptions
+        : [...programOptions, otherOptionValue]
+
+    // Load configurable options from DB on first open (cached after first fetch)
+    useEffect(() => {
+        if (!isOpen) return
+
+        if (_feeStructuresCache) {
+            setFeeStructures(_feeStructuresCache)
+        } else {
+            fetchSetting('fee_structures')
+                .then((val) => {
+                    if (Array.isArray(val) && val.length > 0) {
+                        _feeStructuresCache = val
+                        setFeeStructures(val)
+                    }
+                })
+                .catch(() => {})
+        }
+
+        if (_programOptionsCache) {
+            setProgramOptions(_programOptionsCache)
+        } else {
+            fetchSetting('program_options')
+                .then((val) => {
+                    if (Array.isArray(val) && val.length > 0) {
+                        _programOptionsCache = val
+                        setProgramOptions(val)
+                    }
+                })
+                .catch(() => {})
+        }
+    }, [isOpen])
 
     useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -560,7 +600,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                                     <RadioChoiceGroup
                                         name="programOption"
                                         legend="Program Option"
-                                        options={programOptions}
+                                        options={availableProgramOptions}
                                         value={formData.programOption}
                                         onChange={handleChange}
                                         error={fieldErrors.programOption}

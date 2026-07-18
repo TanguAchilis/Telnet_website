@@ -1,0 +1,27 @@
+/* ================================================================
+   APPLICATION DETAIL — Layout
+   ================================================================ */
+
+.adet-two-col {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.adet-fields {
+    display: grid;
+    gap: 0;
+}
+
+.adet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (max-width: 860px) {
+    .adet-two-col {
+        grid-template-columns: 1fr;
+    }
+}

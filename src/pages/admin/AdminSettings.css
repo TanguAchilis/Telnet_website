@@ -1,0 +1,87 @@
+/* ================================================================
+   ADMIN SETTINGS — Settings editors
+   ================================================================ */
+
+.aset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.aset-card {
+    min-height: 100%;
+}
+
+.aset-description {
+    font-size: 0.87rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.25rem;
+}
+
+.aset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.aset-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    background: #faf8f5;
+    border: 1.5px solid rgba(31, 26, 22, 0.07);
+    border-radius: 10px;
+}
+
+.aset-item-text {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-dark);
+}
+
+.aset-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.aset-add {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 0.5rem;
+    align-items: center;
+}
+
+.aset-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(31, 26, 22, 0.07);
+}
+
+@media (max-width: 980px) {
+    .aset-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .aset-add {
+        flex-direction: column;
+    }
+
+    .aset-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .aset-footer .ap-btn {
+        width: 100%;
+    }
+}

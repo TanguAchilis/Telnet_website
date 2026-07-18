@@ -1,0 +1,504 @@
+/* ================================================================
+   ADMIN PAGES — Shared styles (cards, tables, badges, forms)
+   ================================================================ */
+
+/* Page wrapper */
+.ap-page {
+    max-width: 1100px;
+}
+
+.ap-page-header {
+    margin-bottom: 1.75rem;
+}
+
+.ap-page-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
+}
+
+.ap-page-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+/* ----------------------------------------------------------------
+   Cards
+   ---------------------------------------------------------------- */
+.ap-card {
+    background: white;
+    border: 1px solid rgba(31, 26, 22, 0.07);
+    border-radius: 14px;
+    padding: 1.4rem 1.5rem;
+}
+
+.ap-card-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 1rem;
+}
+
+/* ----------------------------------------------------------------
+   Stat cards row
+   ---------------------------------------------------------------- */
+.ap-stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ap-stat {
+    background: white;
+    border: 1px solid rgba(31, 26, 22, 0.07);
+    border-radius: 14px;
+    padding: 1.25rem 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.ap-stat-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.ap-stat-value {
+    font-family: var(--font-heading);
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    line-height: 1;
+}
+
+.ap-stat-sub {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.ap-stat-accent .ap-stat-value { color: var(--color-accent); }
+.ap-stat-blue .ap-stat-value { color: #3b82f6; }
+.ap-stat-green .ap-stat-value { color: var(--color-success); }
+.ap-stat-amber .ap-stat-value { color: #d97706; }
+
+/* ----------------------------------------------------------------
+   Status badges
+   ---------------------------------------------------------------- */
+.ap-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.ap-badge-new { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+.ap-badge-reviewing { background: rgba(217, 119, 6, 0.1); color: #b45309; }
+.ap-badge-approved { background: rgba(46, 125, 82, 0.1); color: var(--color-success); }
+.ap-badge-rejected { background: rgba(220, 38, 38, 0.08); color: #dc2626; }
+.ap-badge-completed { background: rgba(139, 92, 246, 0.1); color: #7c3aed; }
+
+/* ----------------------------------------------------------------
+   Table
+   ---------------------------------------------------------------- */
+.ap-table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid rgba(31, 26, 22, 0.07);
+    background: white;
+}
+
+.ap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.ap-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid rgba(31, 26, 22, 0.07);
+    white-space: nowrap;
+    background: #faf8f5;
+}
+
+.ap-table td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(31, 26, 22, 0.05);
+    color: var(--color-text);
+    vertical-align: middle;
+}
+
+.ap-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.ap-table tbody tr {
+    transition: background 0.12s;
+}
+
+.ap-table tbody tr:hover {
+    background: #faf8f5;
+}
+
+.ap-table-link {
+    cursor: pointer;
+}
+
+.ap-table-name {
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.ap-table-muted {
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+}
+
+/* ----------------------------------------------------------------
+   Toolbar (search + filters)
+   ---------------------------------------------------------------- */
+.ap-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.ap-search {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.ap-search svg {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gray-400);
+    pointer-events: none;
+}
+
+.ap-search input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 1.5px solid rgba(31, 26, 22, 0.1);
+    border-radius: 10px;
+    background: white;
+    font: inherit;
+    font-size: 0.88rem;
+    color: var(--color-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ap-search input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(232, 103, 60, 0.1);
+}
+
+.ap-select {
+    padding: 0.7rem 1rem;
+    border: 1.5px solid rgba(31, 26, 22, 0.1);
+    border-radius: 10px;
+    background: white;
+    font: inherit;
+    font-size: 0.88rem;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.ap-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+/* ----------------------------------------------------------------
+   Pagination
+   ---------------------------------------------------------------- */
+.ap-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border-top: 1px solid rgba(31, 26, 22, 0.07);
+    font-size: 0.83rem;
+    color: var(--color-text-secondary);
+}
+
+.ap-pagination-btns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.ap-btn-page {
+    padding: 0.45rem 0.9rem;
+    border: 1.5px solid rgba(31, 26, 22, 0.1);
+    border-radius: 8px;
+    background: white;
+    font: inherit;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.ap-btn-page:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.ap-btn-page:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ----------------------------------------------------------------
+   Field display (application detail)
+   ---------------------------------------------------------------- */
+.ap-field {
+    display: grid;
+    gap: 0.2rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(31, 26, 22, 0.06);
+}
+
+.ap-field:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.ap-field-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+}
+
+.ap-field-value {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--color-dark);
+}
+
+/* ----------------------------------------------------------------
+   Form elements
+   ---------------------------------------------------------------- */
+.ap-form-group {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.ap-label {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.ap-input,
+.ap-textarea {
+    padding: 0.78rem 1rem;
+    border: 1.5px solid rgba(31, 26, 22, 0.12);
+    border-radius: 10px;
+    background: white;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--color-text);
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ap-input:focus,
+.ap-textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(232, 103, 60, 0.1);
+}
+
+.ap-textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+/* ----------------------------------------------------------------
+   Buttons
+   ---------------------------------------------------------------- */
+.ap-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.72rem 1.3rem;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    border: none;
+    white-space: nowrap;
+}
+
+.ap-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.ap-btn-primary {
+    background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+    color: white;
+    box-shadow: 0 4px 14px rgba(232, 103, 60, 0.3);
+}
+
+.ap-btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(232, 103, 60, 0.4);
+}
+
+.ap-btn-secondary {
+    background: white;
+    color: var(--color-text);
+    border: 1.5px solid rgba(31, 26, 22, 0.13);
+}
+
+.ap-btn-secondary:hover:not(:disabled) {
+    background: #faf8f5;
+    border-color: rgba(31, 26, 22, 0.22);
+}
+
+.ap-btn-danger {
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    border: 1.5px solid rgba(220, 38, 38, 0.15);
+}
+
+.ap-btn-danger:hover:not(:disabled) {
+    background: rgba(220, 38, 38, 0.14);
+}
+
+.ap-btn-sm {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
+}
+
+/* ----------------------------------------------------------------
+   Spinner / Loading / Empty
+   ---------------------------------------------------------------- */
+.ap-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 3rem 1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.ap-spinner {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: 3px solid rgba(232, 103, 60, 0.18);
+    border-top-color: var(--color-accent);
+    animation: adminSpin 0.7s linear infinite;
+    display: block;
+}
+
+.ap-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 1rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    gap: 0.5rem;
+}
+
+.ap-empty svg {
+    opacity: 0.3;
+    margin-bottom: 0.35rem;
+}
+
+.ap-empty strong {
+    font-size: 0.95rem;
+    color: var(--color-dark);
+}
+
+.ap-empty p {
+    font-size: 0.85rem;
+}
+
+/* Alert */
+.ap-alert {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+}
+
+.ap-alert-error {
+    background: rgba(220, 38, 38, 0.07);
+    border: 1.5px solid rgba(220, 38, 38, 0.18);
+    color: #dc2626;
+}
+
+.ap-alert-success {
+    background: rgba(46, 125, 82, 0.07);
+    border: 1.5px solid rgba(46, 125, 82, 0.2);
+    color: var(--color-success);
+}
+
+/* Back link */
+.ap-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+    transition: color 0.15s;
+}
+
+.ap-back:hover { color: var(--color-accent); }
+
+/* ----------------------------------------------------------------
+   Responsive
+   ---------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .ap-stat-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .ap-stat-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}

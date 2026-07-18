@@ -1,0 +1,122 @@
+/* ================================================================
+   ADMIN DASHBOARD — Layout extras
+   ================================================================ */
+
+.adash-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+/* Horizontal bar chart */
+.adash-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.adash-bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 28px;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.adash-bar-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adash-bar-track {
+    height: 8px;
+    background: rgba(31, 26, 22, 0.07);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.adash-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-dark), var(--color-accent));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.adash-bar-count {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-align: right;
+}
+
+/* Status breakdown */
+.adash-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.adash-status-row {
+    display: grid;
+    grid-template-columns: 90px 28px 1fr;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.adash-status-count {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-align: right;
+}
+
+.adash-status-bar-track {
+    height: 7px;
+    background: rgba(31, 26, 22, 0.07);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.adash-status-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.adash-bar-new { background: #3b82f6; }
+.adash-bar-reviewing { background: #d97706; }
+.adash-bar-approved { background: var(--color-success); }
+.adash-bar-rejected { background: #dc2626; }
+.adash-bar-completed { background: #7c3aed; }
+
+/* Card header with action */
+.adash-card-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.adash-view-all {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.adash-view-all:hover { opacity: 0.75; }
+
+@media (max-width: 700px) {
+    .adash-two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .adash-bar-row {
+        grid-template-columns: 100px 1fr 24px;
+    }
+}

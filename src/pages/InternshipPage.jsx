@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import InternshipApplication from '../components/InternshipApplication'
+import { fetchSetting } from '../utils/admin'
 import './PageBanner.css'
 
 const learningModes = [
@@ -9,7 +10,7 @@ const learningModes = [
     { value: 'Short Course (Job Seekers) 4-6 Months', label: 'Short Course (Job Seekers) 4-6 Months', description: '' },
 ]
 
-const programOptions = [
+const DEFAULT_PROGRAM_OPTIONS = [
     'Networking & Security (NWS, CSN, etc)',
     'Cyber Security (pro interns)',
     'Telecommunications',
@@ -17,6 +18,8 @@ const programOptions = [
     'Electrical Power Systems',
     'Software Engineering (BTech & HND)',
 ]
+
+let programOptionsCache = null
 
 const checklist = [
     'All information collected is safe and used solely to facilitate the application process.',
@@ -28,6 +31,23 @@ const paymentManagerUrl = 'https://wa.me/237671621015?text=Hello%20Manager%2C%20
 
 export default function InternshipPage() {
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [programOptions, setProgramOptions] = useState(programOptionsCache ?? DEFAULT_PROGRAM_OPTIONS)
+
+    useEffect(() => {
+        if (programOptionsCache) {
+            setProgramOptions(programOptionsCache)
+            return
+        }
+
+        fetchSetting('program_options')
+            .then((value) => {
+                if (Array.isArray(value) && value.length > 0) {
+                    programOptionsCache = value
+                    setProgramOptions(value)
+                }
+            })
+            .catch(() => {})
+    }, [])
 
     return (
         <>
