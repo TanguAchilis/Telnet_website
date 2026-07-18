@@ -24,12 +24,14 @@ revoke all on function public.is_admin from anon;
 -- Internship applications: admin read + update policies
 -- -----------------------------------------------------------------------
 
+drop policy if exists "Admins can read all internship applications" on public.internship_applications;
 create policy "Admins can read all internship applications"
     on public.internship_applications
     for select
     to authenticated
     using (public.is_admin());
 
+drop policy if exists "Admins can update internship applications" on public.internship_applications;
 create policy "Admins can update internship applications"
     on public.internship_applications
     for update
@@ -56,18 +58,21 @@ alter table public.admin_settings enable row level security;
 alter table public.admin_settings force row level security;
 
 -- Public can read settings (fee structures are displayed on the public form)
+drop policy if exists "Anyone can read admin settings" on public.admin_settings;
 create policy "Anyone can read admin settings"
     on public.admin_settings
     for select
     to anon, authenticated
     using (true);
 
+drop policy if exists "Admins can insert settings" on public.admin_settings;
 create policy "Admins can insert settings"
     on public.admin_settings
     for insert
     to authenticated
     with check (public.is_admin());
 
+drop policy if exists "Admins can update settings" on public.admin_settings;
 create policy "Admins can update settings"
     on public.admin_settings
     for update
@@ -97,18 +102,21 @@ create table if not exists public.admin_profiles (
 alter table public.admin_profiles enable row level security;
 alter table public.admin_profiles force row level security;
 
+drop policy if exists "Admins can read admin profiles" on public.admin_profiles;
 create policy "Admins can read admin profiles"
     on public.admin_profiles
     for select
     to authenticated
     using (public.is_admin());
 
+drop policy if exists "Admins can insert admin profiles" on public.admin_profiles;
 create policy "Admins can insert admin profiles"
     on public.admin_profiles
     for insert
     to authenticated
     with check (public.is_admin());
 
+drop policy if exists "Admins can delete admin profiles" on public.admin_profiles;
 create policy "Admins can delete admin profiles"
     on public.admin_profiles
     for delete
