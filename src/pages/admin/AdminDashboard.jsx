@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { fetchApplicationStats } from '../../utils/admin'
 import './admin.css'
 import './AdminDashboard.css'
@@ -34,6 +34,7 @@ const STATUS_LABEL = {
 }
 
 export default function AdminDashboard() {
+    const navigate = useNavigate()
     const [stats, setStats] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -163,17 +164,21 @@ export default function AdminDashboard() {
                         <table className="ap-table">
                             <thead>
                                 <tr>
+                                    <th>Applicant</th>
                                     <th>Programme</th>
-                                    <th>Mode</th>
                                     <th>Status</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {recent.map((app, i) => (
-                                    <tr key={i}>
-                                        <td className="ap-table-name">{app.program_option || '—'}</td>
-                                        <td className="ap-table-muted">{app.mode_of_learning || '—'}</td>
+                                {recent.map((app) => (
+                                    <tr
+                                        key={app.id}
+                                        className={app.id ? 'ap-table-link' : ''}
+                                        onClick={app.id ? () => navigate(`/admin/applications/${app.id}`) : undefined}
+                                    >
+                                        <td className="ap-table-name">{app.full_name || '—'}</td>
+                                        <td className="ap-table-muted">{app.program_option || '—'}</td>
                                         <td><span className={`ap-badge ap-badge-${app.status}`}>{STATUS_LABEL[app.status] || app.status}</span></td>
                                         <td className="ap-table-muted">{app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '—'}</td>
                                     </tr>

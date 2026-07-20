@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { signOutAdmin } from '../../utils/admin'
 import { supabase } from '../../utils/supabase'
@@ -53,11 +53,13 @@ export default function AdminLayout() {
     const [userEmail, setUserEmail] = useState('')
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
-    useState(() => {
+    useEffect(() => {
+        let active = true
         supabase?.auth.getUser().then(({ data: { user } }) => {
-            if (user) setUserEmail(user.email)
+            if (active && user) setUserEmail(user.email)
         })
-    })
+        return () => { active = false }
+    }, [])
 
     const handleLogout = async () => {
         await signOutAdmin()

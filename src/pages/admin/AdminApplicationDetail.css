@@ -2,6 +2,13 @@
    APPLICATION DETAIL — Layout
    ================================================================ */
 
+.adet-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
 .adet-two-col {
     display: grid;
     grid-template-columns: 1fr 320px;
@@ -9,9 +16,62 @@
     align-items: start;
 }
 
+.adet-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: sticky;
+    top: 72px;
+}
+
+/* Grouped sections of applicant fields */
+.adet-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.adet-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(31, 26, 22, 0.07);
+}
+
 .adet-fields {
     display: grid;
-    gap: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.5rem;
+}
+
+.adet-fields .ap-field {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.adet-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.adet-link:hover {
+    text-decoration: underline;
+}
+
+/* Contact action buttons */
+.adet-contact-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.adet-contact-btn {
+    width: 100%;
 }
 
 .adet-form {
@@ -20,8 +80,25 @@
     gap: 1rem;
 }
 
+.adet-btn-spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: white;
+}
+
 @media (max-width: 860px) {
     .adet-two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .adet-side {
+        position: static;
+    }
+}
+
+@media (max-width: 520px) {
+    .adet-fields {
         grid-template-columns: 1fr;
     }
 }

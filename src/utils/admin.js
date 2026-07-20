@@ -74,7 +74,7 @@ export async function updateApplication(id, updates) {
 export async function fetchApplicationStats() {
     const { data, error } = await supabase
         .from('internship_applications')
-        .select('status, program_option, mode_of_learning, submitted_at')
+        .select('id, full_name, status, program_option, mode_of_learning, submitted_at')
     if (error) throw error
     return data
 }
