@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
+import { fetchSiteStats } from '../utils/content'
 import './Hero.css'
+
+const DEFAULT_STATS = { happy_clients: '500+', interns_trained: '50+', years_experience: '3+' }
 
 const slides = [
     {
@@ -37,6 +40,15 @@ const slides = [
 export default function Hero() {
     const [current, setCurrent] = useState(0)
     const [isTransitioning, setIsTransitioning] = useState(false)
+    const [stats, setStats] = useState(DEFAULT_STATS)
+
+    useEffect(() => {
+        let active = true
+        fetchSiteStats()
+            .then((val) => { if (active && val) setStats({ ...DEFAULT_STATS, ...val }) })
+            .catch(() => { /* keep defaults */ })
+        return () => { active = false }
+    }, [])
 
     const goToSlide = useCallback((index) => {
         if (isTransitioning) return
@@ -112,17 +124,17 @@ export default function Hero() {
 
                 <div className="hero-stats">
                     <div className="hero-stat">
-                        <span className="hero-stat-number">500+</span>
+                        <span className="hero-stat-number">{stats.happy_clients}</span>
                         <span className="hero-stat-label">Happy Clients</span>
                     </div>
                     <div className="hero-stat-divider"></div>
                     <div className="hero-stat">
-                        <span className="hero-stat-number">50+</span>
+                        <span className="hero-stat-number">{stats.interns_trained}</span>
                         <span className="hero-stat-label">Interns Trained</span>
                     </div>
                     <div className="hero-stat-divider"></div>
                     <div className="hero-stat">
-                        <span className="hero-stat-number">3+</span>
+                        <span className="hero-stat-number">{stats.years_experience}</span>
                         <span className="hero-stat-label">Years Experience</span>
                     </div>
                 </div>

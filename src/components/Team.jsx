@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react'
+import { fetchTeamMembers } from '../utils/content'
 import './Team.css'
 
-const teamMembers = [
+// Fallback content (used before the CMS migration is run / DB is empty).
+const DEFAULT_TEAM = [
     {
         name: 'Taku Otto Angwa',
         role: 'CEO',
@@ -22,6 +25,25 @@ const teamMembers = [
 ]
 
 export default function Team({ showHeader = true }) {
+    const [teamMembers, setTeamMembers] = useState(DEFAULT_TEAM)
+
+    useEffect(() => {
+        let active = true
+        fetchTeamMembers()
+            .then((rows) => {
+                if (active && Array.isArray(rows) && rows.length > 0) {
+                    setTeamMembers(rows.map((m) => ({
+                        name: m.name,
+                        role: m.role,
+                        title: m.title,
+                        image: m.photo_url,
+                    })))
+                }
+            })
+            .catch(() => { /* keep fallback */ })
+        return () => { active = false }
+    }, [])
+
     return (
         <section id="team" className="section team-section">
             <div className="container">

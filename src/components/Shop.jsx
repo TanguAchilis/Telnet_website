@@ -1,52 +1,39 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
+import { fetchShopCategories } from '../utils/content'
 import './Shop.css'
 
-const categories = [
-    {
-        title: 'Student Laptops',
-        desc: 'Affordable, reliable laptops perfect for schoolwork, research, and everyday use.',
-        icon: '🎓',
-        priceRange: 'From 80,000 FCFA',
-        whatsappKey: 'studentLaptops',
-    },
-    {
-        title: 'Gaming Laptops',
-        desc: 'High-performance machines with dedicated graphics and fast processors for gaming enthusiasts.',
-        icon: '🎮',
-        priceRange: 'From 200,000 FCFA',
-        whatsappKey: 'gamingLaptops',
-    },
-    {
-        title: 'Business Laptops',
-        desc: 'Professional-grade laptops with enhanced security, durability, and productivity features.',
-        icon: '💼',
-        priceRange: 'From 150,000 FCFA',
-        whatsappKey: 'businessLaptops',
-    },
-    {
-        title: 'Desktop Screens',
-        desc: 'Quality monitors and desktop displays for workstations and office setups.',
-        icon: '🖥️',
-        priceRange: 'From 40,000 FCFA',
-        whatsappKey: 'desktopScreens',
-    },
-    {
-        title: 'Accessories',
-        desc: 'Keyboards, mice, chargers, bags, USB hubs, and all essential laptop accessories.',
-        icon: '⌨️',
-        priceRange: 'From 2,000 FCFA',
-        whatsappKey: 'accessories',
-    },
-    {
-        title: 'Networking Tools',
-        desc: 'Routers, switches, cables, and all networking equipment for home and office setup.',
-        icon: '🔌',
-        priceRange: 'From 5,000 FCFA',
-        whatsappKey: 'networkingTools',
-    },
+// Fallback categories (used before the CMS migration is run / DB is empty).
+const DEFAULT_CATEGORIES = [
+    { slug: 'student-laptops', name: 'Student Laptops', description: 'Affordable, reliable laptops perfect for schoolwork, research, and everyday use.' },
+    { slug: 'gaming-laptops', name: 'Gaming Laptops', description: 'High-performance machines with dedicated graphics and fast processors for gaming enthusiasts.' },
+    { slug: 'business-laptops', name: 'Business Laptops', description: 'Professional-grade laptops with enhanced security, durability, and productivity features.' },
+    { slug: 'desktop-screens', name: 'Desktop Screens', description: 'Quality monitors and desktop displays for workstations and office setups.' },
+    { slug: 'accessories', name: 'Accessories', description: 'Keyboards, mice, chargers, bags, USB hubs, and all essential laptop accessories.' },
+    { slug: 'networking-tools', name: 'Networking Tools', description: 'Routers, switches, cables, and all networking equipment for home and office setup.' },
 ]
 
+const CATEGORY_ICONS = {
+    'student-laptops': '🎓',
+    'gaming-laptops': '🎮',
+    'business-laptops': '💼',
+    'desktop-screens': '🖥️',
+    'accessories': '⌨️',
+    'networking-tools': '🔌',
+}
+
 export default function Shop({ showHeader = true }) {
+    const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+
+    useEffect(() => {
+        fetchShopCategories()
+            .then((cats) => {
+                if (Array.isArray(cats) && cats.length > 0) setCategories(cats)
+            })
+            .catch(() => { /* keep fallback */ })
+    }, [])
+
     return (
         <section id="shop" className="section shop-section">
             <div className="container">
@@ -55,35 +42,34 @@ export default function Shop({ showHeader = true }) {
                         <span className="section-label">Our Products</span>
                         <h2 className="section-title"><span className="text-gradient-accent">Shop</span></h2>
                         <p className="section-subtitle">
-                            Go through our collection of quality laptops and accessories suitable for professionals, school and personal use. We offer devices from trusted brands like HP, Dell, Lenovo, Acer and more.
+                            Browse our collection of quality laptops and accessories from trusted brands like HP, Dell, Lenovo, Acer and more. Choose a category to see what's available.
                         </p>
                     </div>
                 )}
 
                 <div className="shop-grid">
-                    {categories.map((cat, index) => (
-                        <div key={index} className="shop-card glass-card animate-on-scroll">
-                            <span className="shop-emoji">{cat.icon}</span>
-                            <h3 className="shop-card-title">{cat.title}</h3>
-                            <p className="shop-card-desc">{cat.desc}</p>
+                    {categories.map((cat) => (
+                        <Link key={cat.slug} to={`/shop/${cat.slug}`} className="shop-card animate-on-scroll">
+                            {cat.image_url ? (
+                                <div className="shop-card-media">
+                                    <img src={cat.image_url} alt={cat.name} loading="lazy" />
+                                </div>
+                            ) : (
+                                <span className="shop-emoji">{CATEGORY_ICONS[cat.slug] || '🛍️'}</span>
+                            )}
+                            <h3 className="shop-card-title">{cat.name}</h3>
+                            <p className="shop-card-desc">{cat.description}</p>
                             <div className="shop-card-footer">
-                                <span className="shop-price">{cat.priceRange}</span>
-                                <a
-                                    href={getWhatsAppUrl(whatsappMessages[cat.whatsappKey])}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="shop-inquiry-btn"
-                                >
-                                    💬 Inquire →
-                                </a>
+                                <span className="shop-browse">Browse products</span>
+                                <span className="shop-arrow" aria-hidden="true">→</span>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
                 <div className="shop-cta animate-on-scroll">
                     <p className="shop-cta-text">
-                        All products come with reliable support and guidance to help you choose the right devices for your needs.
+                        Can't find what you're looking for? Chat with us and we'll help you find the right device.
                     </p>
                     <a
                         href={getWhatsAppUrl(whatsappMessages.general)}

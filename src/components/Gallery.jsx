@@ -1,72 +1,93 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { fetchGalleryCategories, fetchGalleryImages } from '../utils/content'
 import './Gallery.css'
 
-const categories = [
-    { key: 'all', label: 'All' },
-    { key: 'trainings', label: 'IT Trainings & Internships' },
-    { key: 'girls-in-tech', label: 'Girls in Tech' },
-    { key: 'community', label: 'Community Outreach' },
-    { key: 'installations', label: 'Smart Installations' },
-    { key: 'network', label: 'Network Equipment' },
-    { key: 'computers', label: 'Computers' },
-    { key: 'accessories', label: 'Accessories' },
+// Fallback content (used before the CMS migration is run / DB is empty).
+const DEFAULT_CATEGORIES = [
+    { slug: 'trainings', name: 'IT Trainings & Internships' },
+    { slug: 'girls-in-tech', name: 'Girls in Tech' },
+    { slug: 'community', name: 'Community Outreach' },
+    { slug: 'installations', name: 'Smart Installations' },
+    { slug: 'network', name: 'Network Equipment' },
+    { slug: 'computers', name: 'Computers' },
+    { slug: 'accessories', name: 'Accessories' },
 ]
 
-const images = [
-    // Trainings & Internships
-    { src: '/Our team/other images/training sesseions.jpg', alt: 'Training Sessions', category: 'trainings' },
-    { src: '/Our team/other images/Presentations.jpeg', alt: 'Presentations', category: 'trainings' },
-    { src: '/Our team/other images/practicals.jpeg', alt: 'Practical Sessions', category: 'trainings' },
-    { src: '/Our team/other images/interns.jpeg', alt: 'Our Interns', category: 'trainings' },
-    { src: '/Our team/other images/internship certicate awarded.jpeg', alt: 'Internship Certificates', category: 'trainings' },
-    { src: '/Our team/other images/internship conclusion.jpeg', alt: 'Internship Conclusion', category: 'trainings' },
-    { src: '/Our team/other images/hardware maintenance.jpeg', alt: 'Hardware Maintenance', category: 'trainings' },
-    { src: '/Our team/other images/windows installation.jpeg', alt: 'Windows Installation', category: 'trainings' },
-    { src: '/Our team/other images/camera installation practicals.jpeg', alt: 'Camera Installation Practicals', category: 'trainings' },
-    // Girls in Tech
-    { src: '/Our team/other images/girls in tech/g.jpeg', alt: 'Girls in Tech', category: 'girls-in-tech' },
-    { src: '/Our team/other images/girls in tech/g1.jpeg', alt: 'Girls in Tech Training', category: 'girls-in-tech' },
-    { src: '/Our team/other images/girls in tech/g2.jpeg', alt: 'Girls in Tech Workshop', category: 'girls-in-tech' },
-    { src: '/Our team/other images/girls in tech/g3.jpeg', alt: 'Girls in Tech Program', category: 'girls-in-tech' },
-    { src: '/Our team/other images/girls in tech/g4.jpeg', alt: 'Girls in Tech Session', category: 'girls-in-tech' },
-    // Installations
-    { src: '/Our team/other images/installation/camera.jpeg', alt: 'Camera Installation', category: 'installations' },
-    { src: '/Our team/other images/installation/f.jpeg', alt: 'Field Installation', category: 'installations' },
-    { src: '/Our team/other images/installation/f2.jpeg', alt: 'Installation Work', category: 'installations' },
-    { src: '/Our team/other images/installation/f3.jpeg', alt: 'On-site Installation', category: 'installations' },
-    { src: '/Our team/other images/installation/f4.jpeg', alt: 'Installation Project', category: 'installations' },
-    { src: '/Our team/other images/installation/field work.jpeg', alt: 'Field Work', category: 'installations' },
-    // Computers / Laptops
-    { src: '/Our team/other images/laptop.jpg', alt: 'Laptop', category: 'computers' },
-    { src: '/Our team/other images/laptop/Dell..jpeg', alt: 'Dell Laptop', category: 'computers' },
-    { src: '/Our team/other images/laptop/DELL.jpeg', alt: 'Dell Computer', category: 'computers' },
-    { src: '/Our team/other images/laptop/delll.jpeg', alt: 'Dell Device', category: 'computers' },
-    { src: '/Our team/other images/laptop/HP..jpeg', alt: 'HP Laptop', category: 'computers' },
-    { src: '/Our team/other images/laptop/hp.jpeg', alt: 'HP Computer', category: 'computers' },
-    { src: '/Our team/other images/laptop/HPs.jpeg', alt: 'HP Devices', category: 'computers' },
-    { src: '/Our team/other images/laptop/L1.jpeg', alt: 'Laptop Model 1', category: 'computers' },
-    { src: '/Our team/other images/laptop/L2.jpeg', alt: 'Laptop Model 2', category: 'computers' },
-    { src: '/Our team/other images/laptop/l3.jpeg', alt: 'Laptop Model 3', category: 'computers' },
-    { src: '/Our team/other images/laptop/l4.jpeg', alt: 'Laptop Model 4', category: 'computers' },
-    { src: '/Our team/other images/laptop/laptop.jpg', alt: 'Laptop Display', category: 'computers' },
-    { src: '/Our team/other images/laptop/macbook.jpeg', alt: 'MacBook', category: 'computers' },
-    // Accessories
-    { src: '/Our team/other images/accessories/calculators.jpeg', alt: 'Calculators', category: 'accessories' },
-    { src: '/Our team/other images/accessories/display cable.jpeg', alt: 'Display Cable', category: 'accessories' },
-    { src: '/Our team/other images/accessories/HDMI and VGA adapter.jpeg', alt: 'HDMI & VGA Adapter', category: 'accessories' },
-    { src: '/Our team/other images/accessories/portable laptop bags.jpeg', alt: 'Portable Laptop Bags', category: 'accessories' },
-    // Network Equipment
-    { src: '/Our team/other images/camera.jpeg', alt: 'Camera Equipment', category: 'network' },
-    { src: '/Our team/other images/network equipments/utility knives.jpeg', alt: 'Utility Knives', category: 'network' },
+const DEFAULT_IMAGES = [
+    { image_url: '/Our team/other images/training sesseions.jpg', caption: 'Training Sessions', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/Presentations.jpeg', caption: 'Presentations', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/practicals.jpeg', caption: 'Practical Sessions', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/interns.jpeg', caption: 'Our Interns', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/internship certicate awarded.jpeg', caption: 'Internship Certificates', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/internship conclusion.jpeg', caption: 'Internship Conclusion', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/hardware maintenance.jpeg', caption: 'Hardware Maintenance', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/windows installation.jpeg', caption: 'Windows Installation', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/camera installation practicals.jpeg', caption: 'Camera Installation Practicals', categorySlug: 'trainings' },
+    { image_url: '/Our team/other images/girls in tech/g.jpeg', caption: 'Girls in Tech', categorySlug: 'girls-in-tech' },
+    { image_url: '/Our team/other images/girls in tech/g1.jpeg', caption: 'Girls in Tech Training', categorySlug: 'girls-in-tech' },
+    { image_url: '/Our team/other images/girls in tech/g2.jpeg', caption: 'Girls in Tech Workshop', categorySlug: 'girls-in-tech' },
+    { image_url: '/Our team/other images/girls in tech/g3.jpeg', caption: 'Girls in Tech Program', categorySlug: 'girls-in-tech' },
+    { image_url: '/Our team/other images/girls in tech/g4.jpeg', caption: 'Girls in Tech Session', categorySlug: 'girls-in-tech' },
+    { image_url: '/Our team/other images/installation/camera.jpeg', caption: 'Camera Installation', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/installation/f.jpeg', caption: 'Field Installation', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/installation/f2.jpeg', caption: 'Installation Work', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/installation/f3.jpeg', caption: 'On-site Installation', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/installation/f4.jpeg', caption: 'Installation Project', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/installation/field work.jpeg', caption: 'Field Work', categorySlug: 'installations' },
+    { image_url: '/Our team/other images/laptop.jpg', caption: 'Laptop', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/Dell..jpeg', caption: 'Dell Laptop', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/DELL.jpeg', caption: 'Dell Computer', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/delll.jpeg', caption: 'Dell Device', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/HP..jpeg', caption: 'HP Laptop', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/hp.jpeg', caption: 'HP Computer', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/HPs.jpeg', caption: 'HP Devices', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/L1.jpeg', caption: 'Laptop Model 1', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/L2.jpeg', caption: 'Laptop Model 2', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/l3.jpeg', caption: 'Laptop Model 3', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/l4.jpeg', caption: 'Laptop Model 4', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/laptop.jpg', caption: 'Laptop Display', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/laptop/macbook.jpeg', caption: 'MacBook', categorySlug: 'computers' },
+    { image_url: '/Our team/other images/accessories/calculators.jpeg', caption: 'Calculators', categorySlug: 'accessories' },
+    { image_url: '/Our team/other images/accessories/display cable.jpeg', caption: 'Display Cable', categorySlug: 'accessories' },
+    { image_url: '/Our team/other images/accessories/HDMI and VGA adapter.jpeg', caption: 'HDMI & VGA Adapter', categorySlug: 'accessories' },
+    { image_url: '/Our team/other images/accessories/portable laptop bags.jpeg', caption: 'Portable Laptop Bags', categorySlug: 'accessories' },
+    { image_url: '/Our team/other images/camera.jpeg', caption: 'Camera Equipment', categorySlug: 'network' },
+    { image_url: '/Our team/other images/network equipments/utility knives.jpeg', caption: 'Utility Knives', categorySlug: 'network' },
 ]
 
 export default function Gallery({ showHeader = true }) {
+    const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+    const [images, setImages] = useState(DEFAULT_IMAGES)
     const [lightbox, setLightbox] = useState(null)
     const [activeCategory, setActiveCategory] = useState('all')
 
+    useEffect(() => {
+        let active = true
+        Promise.all([fetchGalleryCategories(), fetchGalleryImages()])
+            .then(([cats, imgs]) => {
+                if (!active) return
+                if (Array.isArray(imgs) && imgs.length > 0) {
+                    setImages(imgs.map((img) => ({
+                        image_url: img.image_url,
+                        caption: img.caption,
+                        categorySlug: img.category?.slug || null,
+                        categoryName: img.category?.name || null,
+                    })))
+                    if (Array.isArray(cats) && cats.length > 0) {
+                        setCategories(cats.map((c) => ({ slug: c.slug, name: c.name })))
+                    }
+                }
+            })
+            .catch(() => { /* keep fallback */ })
+        return () => { active = false }
+    }, [])
+
+    const allCategories = [{ slug: 'all', name: 'All' }, ...categories]
+    const categoryName = (slug) => categories.find((c) => c.slug === slug)?.name || slug
+
     const filtered = activeCategory === 'all'
         ? images
-        : images.filter(img => img.category === activeCategory)
+        : images.filter((img) => img.categorySlug === activeCategory)
 
     return (
         <section id="gallery" className="section gallery-section">
@@ -82,13 +103,13 @@ export default function Gallery({ showHeader = true }) {
                 )}
 
                 <div className="gallery-categories">
-                    {categories.map(cat => (
+                    {allCategories.map((cat) => (
                         <button
-                            key={cat.key}
-                            className={`gallery-cat-btn${activeCategory === cat.key ? ' active' : ''}`}
-                            onClick={() => setActiveCategory(cat.key)}
+                            key={cat.slug}
+                            className={`gallery-cat-btn${activeCategory === cat.slug ? ' active' : ''}`}
+                            onClick={() => setActiveCategory(cat.slug)}
                         >
-                            {cat.label}
+                            {cat.name}
                         </button>
                     ))}
                 </div>
@@ -97,16 +118,16 @@ export default function Gallery({ showHeader = true }) {
                     {filtered.length > 0 ? (
                         filtered.map((img, index) => (
                             <div
-                                key={img.src}
+                                key={`${img.image_url}-${index}`}
                                 className="gallery-item animate-on-scroll"
                                 onClick={() => setLightbox(index)}
                             >
-                                <img src={img.src} alt={img.alt} loading="lazy" />
+                                <img src={img.image_url} alt={img.caption || ''} loading="lazy" />
                                 <div className="gallery-overlay">
                                     <span className="gallery-tag">
-                                        {categories.find(c => c.key === img.category)?.label || img.category}
+                                        {img.categoryName || categoryName(img.categorySlug)}
                                     </span>
-                                    <span className="gallery-title">{img.alt}</span>
+                                    <span className="gallery-title">{img.caption}</span>
                                 </div>
                             </div>
                         ))
@@ -122,9 +143,9 @@ export default function Gallery({ showHeader = true }) {
                 <div className="lightbox" onClick={() => setLightbox(null)}>
                     <button className="lightbox-close" onClick={() => setLightbox(null)}>✕</button>
                     <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + filtered.length) % filtered.length) }}>‹</button>
-                    <img src={filtered[lightbox].src} alt={filtered[lightbox].alt} className="lightbox-image" onClick={(e) => e.stopPropagation()} />
+                    <img src={filtered[lightbox].image_url} alt={filtered[lightbox].caption || ''} className="lightbox-image" onClick={(e) => e.stopPropagation()} />
                     <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % filtered.length) }}>›</button>
-                    <p className="lightbox-caption">{filtered[lightbox].alt}</p>
+                    <p className="lightbox-caption">{filtered[lightbox].caption}</p>
                 </div>
             )}
         </section>

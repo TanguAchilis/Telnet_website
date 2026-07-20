@@ -114,6 +114,15 @@
     transform: scale(1.08);
 }
 
+.service-icon-emoji {
+    font-size: 1.9rem;
+    line-height: 1;
+}
+
+.bento-item-1 .service-icon-emoji {
+    font-size: 2.4rem;
+}
+
 .service-title {
     font-size: 1.2rem;
     font-weight: 700;

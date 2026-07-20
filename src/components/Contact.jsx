@@ -1,10 +1,31 @@
-import { useState } from 'react'
-import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
+import { useEffect, useState } from 'react'
+import { whatsappMessages } from '../utils/whatsapp'
+import { fetchContactInfo } from '../utils/content'
 import './Contact.css'
+
+const DEFAULT_CONTACT = {
+    phone: '+237 671 827 893 / 674 410 358',
+    email: 'telnetinc23@gmail.com',
+    address: 'Tarred Malingo, behind Amazing Pharmacy, Molyko-Buea / St Claire',
+    whatsapp: '237671827893',
+    hours: 'Tue – Fri: 8am – 7pm\nSaturday: 9am – 6pm',
+}
 
 export default function Contact({ showHeader = true }) {
     const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', subject: '', message: '' })
     const [submitted, setSubmitted] = useState(false)
+    const [contact, setContact] = useState(DEFAULT_CONTACT)
+
+    useEffect(() => {
+        let active = true
+        fetchContactInfo()
+            .then((val) => { if (active && val) setContact({ ...DEFAULT_CONTACT, ...val }) })
+            .catch(() => { /* keep defaults */ })
+        return () => { active = false }
+    }, [])
+
+    const waDigits = (contact.whatsapp || '').replace(/\D/g, '')
+    const waHref = `https://wa.me/${waDigits}?text=${encodeURIComponent(whatsappMessages.general)}`
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -41,7 +62,7 @@ export default function Contact({ showHeader = true }) {
                                 </div>
                                 <div>
                                     <h4>Phone</h4>
-                                    <p>+237 671 827 893 / 674 410 358</p>
+                                    <p>{contact.phone}</p>
                                 </div>
                             </div>
 
@@ -54,12 +75,12 @@ export default function Contact({ showHeader = true }) {
                                 <div>
                                     <h4>WhatsApp</h4>
                                     <a
-                                        href={getWhatsAppUrl(whatsappMessages.general)}
+                                        href={waHref}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="contact-whatsapp-link"
                                     >
-                                        +237 671 827 893 — Chat Now
+                                        Chat with us now
                                     </a>
                                 </div>
                             </div>
@@ -72,7 +93,7 @@ export default function Contact({ showHeader = true }) {
                                 </div>
                                 <div>
                                     <h4>Email</h4>
-                                    <p>telnetinc23@gmail.com</p>
+                                    <p>{contact.email}</p>
                                 </div>
                             </div>
 
@@ -84,7 +105,7 @@ export default function Contact({ showHeader = true }) {
                                 </div>
                                 <div>
                                     <h4>Address</h4>
-                                    <p>Tarred Malingo, behind Amazing Pharmacy<br />Molyko-Buea / St Claire</p>
+                                    <p>{contact.address}</p>
                                 </div>
                             </div>
 
@@ -96,7 +117,11 @@ export default function Contact({ showHeader = true }) {
                                 </div>
                                 <div>
                                     <h4>Business Hours</h4>
-                                    <p>Tue – Fri: 8am – 7pm<br />Saturday: 9am – 6pm</p>
+                                    <p>
+                                        {(contact.hours || '').split('\n').map((line, i, arr) => (
+                                            <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+                                        ))}
+                                    </p>
                                 </div>
                             </div>
                         </div>
