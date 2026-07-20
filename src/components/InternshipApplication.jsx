@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from 'react'
+import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import { submitInternshipApplication } from '../utils/internshipApplications'
@@ -181,6 +181,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
     const [submitted, setSubmitted] = useState(false)
     const [feeStructures, setFeeStructures] = useState(_feeStructuresCache ?? DEFAULT_FEE_STRUCTURES)
     const [programOptions, setProgramOptions] = useState(_programOptionsCache ?? DEFAULT_PROGRAM_OPTIONS)
+    const statusRef = useRef(null)
 
     const isAcademicMode = formData.modeOfLearning === academicModeValue
     const isOtherProgramOption = formData.programOption === otherOptionValue
@@ -250,6 +251,15 @@ export default function InternshipApplication({ isOpen, onClose }) {
         }
     }, [isOpen])
 
+    // Bring the status banner into view whenever an error is shown, so it is
+    // never hidden above the fold on a long, scrolled step.
+    useEffect(() => {
+        if (submitStatus.type === 'error' && submitStatus.message && statusRef.current) {
+            statusRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            statusRef.current.focus?.()
+        }
+    }, [submitStatus])
+
     const reviewItems = [
         {
             label: 'Applicant',
@@ -309,6 +319,10 @@ export default function InternshipApplication({ isOpen, onClose }) {
         const nextStepErrors = replaceStepErrors(currentStep, formData)
 
         if (Object.keys(nextStepErrors).length > 0) {
+            setSubmitStatus({
+                type: 'error',
+                message: 'Please complete the highlighted fields before continuing.',
+            })
             return
         }
 
@@ -367,6 +381,14 @@ export default function InternshipApplication({ isOpen, onClose }) {
                 replaceStepErrors(firstInvalidStep, formData)
                 setCurrentStep(firstInvalidStep)
             }
+
+            const missingCount = Object.keys(allErrors).length
+            setSubmitStatus({
+                type: 'error',
+                message: firstInvalidStep !== -1 && firstInvalidStep !== finalStepIndex
+                    ? `Some required details are incomplete — we've taken you back to fix ${missingCount === 1 ? 'it' : 'them'}.`
+                    : 'Please complete the highlighted fields before submitting.',
+            })
 
             return
         }
@@ -459,7 +481,13 @@ export default function InternshipApplication({ isOpen, onClose }) {
 
                         <form className="ia-body" onSubmit={handleSubmit} noValidate>
                             {submitStatus.message && (
-                                <div className={`ia-status${submitStatus.type === 'error' ? ' ia-status-error' : ' ia-status-success'}`} aria-live="polite">
+                                <div
+                                    ref={statusRef}
+                                    tabIndex={-1}
+                                    className={`ia-status${submitStatus.type === 'error' ? ' ia-status-error' : ' ia-status-success'}`}
+                                    aria-live="assertive"
+                                    role={submitStatus.type === 'error' ? 'alert' : 'status'}
+                                >
                                     {submitStatus.message}
                                 </div>
                             )}
