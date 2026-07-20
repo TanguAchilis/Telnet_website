@@ -356,6 +356,39 @@
 }
 
 /* ============================================================
+   ATTENTION ANIMATION — drives the eye to the first empty field
+   when a submit/next is blocked by validation.
+   ============================================================ */
+@keyframes iaAttentionShake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-7px); }
+    30% { transform: translateX(7px); }
+    45% { transform: translateX(-5px); }
+    60% { transform: translateX(5px); }
+    75% { transform: translateX(-2px); }
+}
+
+@keyframes iaAttentionGlow {
+    0% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.5); }
+    100% { box-shadow: 0 0 0 14px rgba(192, 57, 43, 0); }
+}
+
+.ia-attention {
+    border-radius: 12px;
+    scroll-margin-top: 1.5rem;
+    scroll-margin-bottom: 1.5rem;
+    animation:
+        iaAttentionShake 0.5s ease,
+        iaAttentionGlow 1.2s ease 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ia-attention {
+        animation: iaAttentionGlow 1.2s ease;
+    }
+}
+
+/* ============================================================
    RADIO CHOICE GROUPS
    ============================================================ */
 .ia-radio-group {

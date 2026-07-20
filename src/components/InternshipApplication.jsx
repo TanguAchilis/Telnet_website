@@ -182,6 +182,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
     const [feeStructures, setFeeStructures] = useState(_feeStructuresCache ?? DEFAULT_FEE_STRUCTURES)
     const [programOptions, setProgramOptions] = useState(_programOptionsCache ?? DEFAULT_PROGRAM_OPTIONS)
     const statusRef = useRef(null)
+    const pendingErrorFocus = useRef(false)
 
     const isAcademicMode = formData.modeOfLearning === academicModeValue
     const isOtherProgramOption = formData.programOption === otherOptionValue
@@ -251,13 +252,43 @@ export default function InternshipApplication({ isOpen, onClose }) {
         }
     }, [isOpen])
 
-    // Bring the status banner into view whenever an error is shown, so it is
-    // never hidden above the fold on a long, scrolled step.
+    // When a submit/next is blocked by missing fields, jump straight to the
+    // FIRST empty field, focus it, and play an attention animation so the user
+    // can't miss it — regardless of where they were scrolled on a long step.
     useEffect(() => {
-        if (submitStatus.type === 'error' && submitStatus.message && statusRef.current) {
-            statusRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            statusRef.current.focus?.()
-        }
+        if (!pendingErrorFocus.current) return
+        pendingErrorFocus.current = false
+
+        const stepFields = getInternshipWizardStepFields(currentStep)
+        const firstInvalid = stepFields.find((fieldName) => fieldErrors[fieldName])
+        if (!firstInvalid) return
+
+        const field = document.querySelector(`[name="${firstInvalid}"]`)
+        if (!field) return
+
+        const container = field.closest('.ia-field, .ia-radio-group') || field
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+        // Retrigger the animation even if the same field errors twice in a row.
+        container.classList.remove('ia-attention')
+        void container.offsetWidth
+        container.classList.add('ia-attention')
+
+        // Focus without a second competing scroll.
+        window.requestAnimationFrame(() => field.focus?.({ preventScroll: true }))
+    }, [fieldErrors, currentStep])
+
+    // For submission/server errors (no specific field to point at), make sure
+    // the status banner itself is scrolled into view.
+    useEffect(() => {
+        if (submitStatus.type !== 'error' || !submitStatus.message || !statusRef.current) return
+
+        const stepFields = getInternshipWizardStepFields(currentStep)
+        const hasFieldError = stepFields.some((fieldName) => fieldErrors[fieldName])
+        if (hasFieldError) return // the field-focus effect handles attention
+
+        statusRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        statusRef.current.focus?.()
     }, [submitStatus])
 
     const reviewItems = [
@@ -319,6 +350,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
         const nextStepErrors = replaceStepErrors(currentStep, formData)
 
         if (Object.keys(nextStepErrors).length > 0) {
+            pendingErrorFocus.current = true
             setSubmitStatus({
                 type: 'error',
                 message: 'Please complete the highlighted fields before continuing.',
@@ -380,6 +412,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                 markStepValidated(firstInvalidStep)
                 replaceStepErrors(firstInvalidStep, formData)
                 setCurrentStep(firstInvalidStep)
+                pendingErrorFocus.current = true
             }
 
             const missingCount = Object.keys(allErrors).length
