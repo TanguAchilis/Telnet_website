@@ -31,12 +31,12 @@ function AnimationObserver() {
   const location = useLocation()
 
   useEffect(() => {
-    // Re-observe animated elements on route change
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible')
+            observer.unobserve(entry.target)
           }
         })
       },
@@ -46,16 +46,21 @@ function AnimationObserver() {
       }
     )
 
-    // Small delay to let new page content render
-    const timer = setTimeout(() => {
-      const animatedElements = document.querySelectorAll('.animate-on-scroll')
-      animatedElements.forEach((el) => observer.observe(el))
-    }, 100)
+    // Observe all current animated elements not yet revealed.
+    const observeAll = () => {
+      document.querySelectorAll('.animate-on-scroll:not(.visible)').forEach((el) => observer.observe(el))
+    }
+
+    observeAll()
+
+    // Also observe elements added later (async data: products, gallery,
+    // edited services/team) so dynamic content still reveals.
+    const mutationObserver = new MutationObserver(() => observeAll())
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
 
     return () => {
-      clearTimeout(timer)
-      const animatedElements = document.querySelectorAll('.animate-on-scroll')
-      animatedElements.forEach((el) => observer.unobserve(el))
+      observer.disconnect()
+      mutationObserver.disconnect()
     }
   }, [location])
 
