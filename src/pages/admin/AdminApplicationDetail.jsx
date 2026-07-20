@@ -75,7 +75,9 @@ function resolveValue(app, key) {
 
 function fmt(val) {
     if (val === null || val === undefined || val === '') return '—'
-    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T.*Z$/.test(val)) {
+    // ISO timestamp — Supabase returns e.g. 2026-07-20T17:03:52.769296+00:00
+    // (offset), not a trailing "Z", so match the date+time prefix.
+    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(val)) {
         return new Date(val).toLocaleString()
     }
     if (typeof val === 'string' && VALUE_LABELS[val]) return VALUE_LABELS[val]
