@@ -113,35 +113,6 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------
--- Storage bucket for uploaded images (public read, admin write)
--- ---------------------------------------------------------------------
-
-insert into storage.buckets (id, name, public)
-values ('site-images', 'site-images', true)
-on conflict (id) do update set public = true;
-
-drop policy if exists "Public read site-images" on storage.objects;
-create policy "Public read site-images"
-    on storage.objects for select
-    using (bucket_id = 'site-images');
-
-drop policy if exists "Admins upload site-images" on storage.objects;
-create policy "Admins upload site-images"
-    on storage.objects for insert to authenticated
-    with check (bucket_id = 'site-images' and public.is_admin());
-
-drop policy if exists "Admins update site-images" on storage.objects;
-create policy "Admins update site-images"
-    on storage.objects for update to authenticated
-    using (bucket_id = 'site-images' and public.is_admin())
-    with check (bucket_id = 'site-images' and public.is_admin());
-
-drop policy if exists "Admins delete site-images" on storage.objects;
-create policy "Admins delete site-images"
-    on storage.objects for delete to authenticated
-    using (bucket_id = 'site-images' and public.is_admin());
-
--- ---------------------------------------------------------------------
 -- Seed: site stats + contact info (in the existing admin_settings table)
 -- ---------------------------------------------------------------------
 
@@ -255,3 +226,35 @@ from (values
     ('Emane Kelly Akwa', 'Deputy Manager', 'IT Expert & Trainer', '/Our team/Emane Kelly Akwa(Deputy Manager).jpeg', 3)
 ) as v(name, role, title, photo_url, sort_order)
 where not exists (select 1 from public.team_members);
+
+-- ---------------------------------------------------------------------
+-- Storage bucket for uploaded images (public read, admin write).
+-- Run last: if your project restricts policy creation on storage.objects
+-- (error 42501 "must be owner of table objects"), everything above still
+-- applies — just create the bucket + policies from the Storage dashboard.
+-- ---------------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('site-images', 'site-images', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public read site-images" on storage.objects;
+create policy "Public read site-images"
+    on storage.objects for select
+    using (bucket_id = 'site-images');
+
+drop policy if exists "Admins upload site-images" on storage.objects;
+create policy "Admins upload site-images"
+    on storage.objects for insert to authenticated
+    with check (bucket_id = 'site-images' and public.is_admin());
+
+drop policy if exists "Admins update site-images" on storage.objects;
+create policy "Admins update site-images"
+    on storage.objects for update to authenticated
+    using (bucket_id = 'site-images' and public.is_admin())
+    with check (bucket_id = 'site-images' and public.is_admin());
+
+drop policy if exists "Admins delete site-images" on storage.objects;
+create policy "Admins delete site-images"
+    on storage.objects for delete to authenticated
+    using (bucket_id = 'site-images' and public.is_admin());
