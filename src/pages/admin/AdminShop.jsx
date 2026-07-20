@@ -9,6 +9,7 @@ import {
 } from '../../utils/content'
 import Modal from '../../components/admin/Modal'
 import ImageUpload from '../../components/admin/ImageUpload'
+import MultiImageInput from '../../components/admin/MultiImageInput'
 import './admin.css'
 import './AdminCms.css'
 
@@ -24,7 +25,7 @@ function slugify(text) {
 const emptyCategory = { name: '', slug: '', description: '', image_url: '', is_active: true, sort_order: 0 }
 const emptyProduct = {
     name: '', category_id: '', price: '', price_note: '', brand: '', condition: '',
-    description: '', image_url: '', in_stock: true, featured: false, sort_order: 0,
+    description: '', image_url: '', images: [], in_stock: true, featured: false, sort_order: 0,
 }
 
 export default function AdminShop() {
@@ -107,6 +108,7 @@ export default function AdminShop() {
                 condition: prodModal.condition?.trim() || null,
                 description: prodModal.description?.trim() || null,
                 image_url: prodModal.image_url || null,
+                images: Array.isArray(prodModal.images) ? prodModal.images.filter(Boolean) : [],
                 in_stock: prodModal.in_stock,
                 featured: prodModal.featured,
                 sort_order: Number(prodModal.sort_order) || 0,
@@ -314,8 +316,10 @@ export default function AdminShop() {
                 {prodModal && (
                     <div className="acms-form">
                         {modalError && <div className="ap-alert ap-alert-error">{modalError}</div>}
-                        <ImageUpload value={prodModal.image_url} folder="shop" label="Product image"
+                        <ImageUpload value={prodModal.image_url} folder="shop" label="Main product image"
                             onChange={(url) => setProdModal({ ...prodModal, image_url: url })} />
+                        <MultiImageInput images={prodModal.images} folder="shop" label="More photos (shown as thumbnails on the product page)"
+                            onChange={(imgs) => setProdModal({ ...prodModal, images: imgs })} />
                         <div className="ap-form-group">
                             <label className="ap-label">Name</label>
                             <input className="ap-input" value={prodModal.name} onChange={(e) => setProdModal({ ...prodModal, name: e.target.value })} placeholder="e.g. HP EliteBook 840 G5" />
