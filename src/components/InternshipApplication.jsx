@@ -292,6 +292,18 @@ export default function InternshipApplication({ isOpen, onClose }) {
         statusRef.current.focus?.()
     }, [submitStatus])
 
+    // Post-submission WhatsApp follow-up: reflects that the user has ALREADY
+    // applied (personalised with their name/program), not the generic
+    // "how do I apply?" inquiry used elsewhere.
+    const resolvedProgram = formData.programOption === otherOptionValue
+        ? formData.programOptionOther?.trim()
+        : formData.programOption
+    const submittedWhatsAppMessage =
+        `Hello Telnet Cameroon! I have just submitted my internship application`
+        + (formData.fullName?.trim() ? ` (${formData.fullName.trim()})` : '')
+        + (resolvedProgram ? ` for ${resolvedProgram}` : '')
+        + `. I would like to confirm it was received and ask about the next steps.`
+
     const reviewItems = [
         {
             label: 'Applicant',
@@ -464,7 +476,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                             Thank you! We have received your internship application and will get back to you shortly. Remember to drop your supporting documents at the Malingo office.
                         </p>
                         <a
-                            href={getWhatsAppUrl(whatsappMessages.internship)}
+                            href={getWhatsAppUrl(submittedWhatsAppMessage)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-secondary ia-success-wa"

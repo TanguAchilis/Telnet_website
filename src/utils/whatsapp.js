@@ -36,6 +36,7 @@ export const whatsappMessages = {
     // Contact
     quote: 'Hello Telnet Cameroon! I would like to request a quote for your services. Here are the details: ',
     internship: 'Hello Telnet Cameroon! I am interested in your internship program. Could you share more information about how to apply?',
+    internshipSubmitted: 'Hello Telnet Cameroon! I have just submitted my internship application on your website. I would like to confirm it was received and ask about the next steps.',
 }
 
 /**
