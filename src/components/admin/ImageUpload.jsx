@@ -40,6 +40,13 @@ export default function ImageUpload({ value, onChange, folder = 'misc', label = 
                     )}
                 </div>
             </div>
+            <input
+                type="text"
+                className="ap-input acms-url-input"
+                placeholder="…or paste an image URL"
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+            />
             {error && <p className="ap-field-error">{error}</p>}
         </div>
     )
