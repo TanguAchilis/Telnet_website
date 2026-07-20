@@ -267,15 +267,16 @@ export default function InternshipApplication({ isOpen, onClose }) {
         if (!field) return
 
         const container = field.closest('.ia-field, .ia-radio-group') || field
+
+        // Focus first (without its own scroll), then run our controlled scroll
+        // so the field ends up centred and ready to type into.
+        field.focus?.({ preventScroll: true })
         container.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
         // Retrigger the animation even if the same field errors twice in a row.
         container.classList.remove('ia-attention')
         void container.offsetWidth
         container.classList.add('ia-attention')
-
-        // Focus without a second competing scroll.
-        window.requestAnimationFrame(() => field.focus?.({ preventScroll: true }))
     }, [fieldErrors, currentStep])
 
     // For submission/server errors (no specific field to point at), make sure
