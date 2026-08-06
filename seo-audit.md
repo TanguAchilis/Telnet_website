@@ -1,6 +1,6 @@
 # SEO Audit — Telnet Cameroon
 
-**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `711fa88`
+**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `856a56d`
 
 > §1–§6 are the original audit, left as written. **§7 records what was implemented and measured; §8 is what you must do manually.**
 
@@ -129,7 +129,7 @@ Enumerated from `src/App.jsx:88-118`. **Title, description, and canonical are id
 
 | # | Issue | Sev | File:line | Why it matters | Fix | Effort | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | Every route ships an empty body; no prerendering | **P0** | `dist/index.html:16-18`, `src/main.jsx:6` | Google *can* render JS, but on a delayed second pass with a rendering budget. Bing, and every social crawler (WhatsApp, Facebook, LinkedIn, X) do **not** execute JS at all. For a business whose primary channel is WhatsApp link-sharing, this is the single most expensive defect on the site. | Add a zero-dependency post-build prerender step that writes a real `dist/<route>/index.html` per public route with baked-in meta. Vercel serves the static file before the SPA rewrite fires. | L | 🟡 Partial |
+| 1 | Every route ships an empty body; no prerendering | **P0** | `dist/index.html:16-18`, `src/main.jsx:6` | Google *can* render JS, but on a delayed second pass with a rendering budget. Bing, and every social crawler (WhatsApp, Facebook, LinkedIn, X) do **not** execute JS at all. For a business whose primary channel is WhatsApp link-sharing, this is the single most expensive defect on the site. | Add a zero-dependency post-build prerender step that writes a real `dist/<route>/index.html` per public route with baked-in meta. Vercel serves the static file before the SPA rewrite fires. | L | ✅ Fixed |
 | 2 | One title + description for 11 routes | **P0** | `index.html:7-8` | Google cannot distinguish `/shop` from `/contact`. Duplicate-title signals across the whole site; no page can rank for its own topic. | Central route→metadata map, applied by the prerender step and by a client-side hook on navigation. | M | ✅ Fixed |
 | 3 | Zero canonical tags | **P0** | repo-wide (grep: 0 hits) | With no canonical, `/services`, `/services/`, and any URL with tracking params are three separate URLs competing with each other. | Emit `<link rel="canonical">` per route from the same metadata map. | S | ✅ Fixed |
 | 4 | No `robots.txt`; `/robots.txt` returns HTML 200 | **P0** | absent; caused by `vercel.json:4` | Verified: `curl /robots.txt` returns `<!DOCTYPE html>`. Lighthouse audit `robots-txt` **fails**. Crawlers get a malformed directive file instead of a 404 or a valid one. | Add `public/robots.txt` and exclude static file extensions from the rewrite in `vercel.json`. | S | ✅ Fixed |
@@ -200,7 +200,9 @@ I cannot determine these from the source, so I am not guessing at them.
 
 ## 7. Phase 2 — implementation
 
-Approved 2026-08-06. Eight commits on `main`, one concern each, no drive-by refactors. **No new dependencies were added.**
+Approved 2026-08-06. Eleven commits on `main`, one concern each, no drive-by refactors.
+
+**One dependency added, with approval:** `puppeteer` (devDependency), for the body-prerendering pass in §7.1. Everything else is zero-dependency.
 
 | Commit | Concern | Findings |
 |---|---|---|
@@ -212,6 +214,9 @@ Approved 2026-08-06. Eight commits on `main`, one concern each, no drive-by refa
 | `1ea9640` | JSON-LD: LocalBusiness, WebSite, BreadcrumbList, Product | #14 |
 | `12ca108` | Code-split admin out of the public bundle | #13 |
 | `711fa88` | Defer non-visible hero images, preload the first | #10, #11 |
+| `ebe8068` | Prerender real body HTML with headless Chrome | #1 |
+| `856a56d` | Prerender shop category and product pages | #1 |
+| `2868374` | ESLint Node globals for the build scripts | — |
 
 ### Architecture
 
@@ -219,24 +224,50 @@ Approved 2026-08-06. Eight commits on `main`, one concern each, no drive-by refa
 
 `scripts/prerender.js` writes `dist/<route>/index.html` per public route. `vercel.json` names each of those routes ahead of the SPA catch-all; the prerender script fails the build if the two lists disagree.
 
-### Measured results
+### 7.1 Body prerendering
 
-Lighthouse 13.4.1, headless Chrome, **median of 3 runs each**, against `vite preview` on localhost. Localhost has no network latency, so these are not field numbers.
+`scripts/prerender.js` renders every public route in headless Chrome and bakes the resulting DOM into `<div id="root">`. **24 routes** are prerendered: 8 static, 12 shop categories, 4 products. Shop routes are pulled from Supabase at build time and get per-item metadata and JSON-LD built from the same `shopProductMeta()` / `productSchema()` functions the runtime uses.
 
-| Metric | Before | After | |
+**With JavaScript fully disabled**, measured against a server that resolves paths the way Vercel does:
+
+| Route | Words | Images | Links | H1 |
+|---|---|---|---|---|
+| `/` | 477 | 2 | 40 | Reliable Technology Solutions… |
+| `/services` | 300 | 2 | 38 | Our Services |
+| `/about` | 183 | 2 | 32 | About Telnet |
+| `/team` | 133 | 5 | 32 | Meet Our Experts |
+| `/gallery` | 295 | 42 | 32 | Gallery |
+| `/shop` | 266 | 13 | 44 | Shop |
+| `/internship` | 265 | 2 | 33 | Internship Application |
+| `/contact` | 150 | 2 | 33 | Contact Us |
+
+Every one of these was **0 words with an empty `#root`** before. A product page with JS disabled serves its own title, canonical, product image as `og:image`, `og:type=product`, its H1, and all three JSON-LD blocks including a valid `Offer` (`150000 XAF`, `InStock`).
+
+The app still mounts with `createRoot`, not `hydrateRoot`: Supabase content can't be guaranteed to match between build time and page load, and a hydration mismatch is worse than a discarded first paint. Measured on a throttled connection, no route's content drops out after React mounts.
+
+`src/utils/isPrerender.js` freezes time-based UI during capture. Without it the hero carousel had advanced by snapshot time, so the indexed `<h1>` varied between builds, and idle-warmed slide backgrounds got inlined into the static HTML — silently undoing the LCP work in `711fa88`.
+
+Build cost: **46–47 s** total (vs ~4 s for `vite build` alone), measured over three consecutive clean runs.
+
+### 7.2 Measured results
+
+Lighthouse 13.4.1, headless Chrome, **median of 3 runs each**, on localhost — no network latency, so these are not field numbers.
+
+| Metric | Before | Head-only | + Body prerender |
 |---|---|---|---|
-| Performance | 67 | **71** | ↑ |
-| **SEO** | 92 | **100** | ↑ |
-| Accessibility | 95 | 95 | — |
-| Best practices | 100 | 100 | — |
-| Largest Contentful Paint | 7.7 s | **5.9 s** | ↓ 23% |
-| First Contentful Paint | 3.0 s | 2.9 s | — |
-| Speed Index | 4.6 s | 4.6 s | — |
-| Total page weight | 1,215 KB | **1,024 KB** | ↓ 191 KB |
-| Images on homepage | 959 KB / 6 req | **781 KB / 4 req** | ↓ 178 KB |
-| Entry payload (JS+CSS) | 659 KB | **564 KB** | ↓ 95 KB |
+| Performance | 67 | 71 | **68** |
+| **SEO** | 92 | 100 | **100** |
+| Largest Contentful Paint | 7.7 s | 5.9 s | **6.2 s** |
+| First Contentful Paint | 3.0 s | 2.9 s | **2.9 s** |
+| Speed Index | 4.6 s | 4.6 s | **5.0 s** |
+| Entry payload (JS+CSS) | 659 KB | 564 KB | **564 KB** |
+| **Crawlable text without JS** | none | none | **full page** |
 
-No Lighthouse SEO audits fail after the change.
+Body prerendering costs about 3 performance points and 0.3 s of LCP, because the browser paints the snapshot and React then discards and re-renders it. That is the price of the last column, and it is worth paying.
+
+No Lighthouse SEO audits fail.
+
+**Correction to an earlier figure.** The hero commit reported images dropping from 959 KB/6 requests to 781 KB/4. Comparing the actual network logs, the requests are **identical** in both builds — the smaller reading was a shorter Lighthouse observation window, not fewer bytes. The hero change moves roughly 700 KB *out of the critical path* (the deferred images now load after the load event, which is what the 23% LCP gain reflects); it does not reduce total bytes downloaded.
 
 ### Verified in the generated output
 
@@ -251,11 +282,12 @@ No Lighthouse SEO audits fail after the change.
 
 ### Known limitations — deliberately not papered over
 
-1. **Body copy is still client-rendered (#1 is partial).** Prerendering fixes `<head>` only. A crawler that doesn't execute JavaScript still sees an empty `<div id="root">`. This fully fixes social previews and per-route metadata; it does not make the page's text visible without JS. Closing that gap needs a headless-browser prerender dependency or a framework migration — see the options in §5.
+1. **Prerendered content goes stale between deploys.** The snapshot is a point-in-time copy of CMS data. Edit a product in the admin panel and the static HTML keeps the old text until the next deploy. Visitors always see live data (React re-renders on mount); only crawlers see the snapshot. Standard for any SSG setup, but it means **content changes need a redeploy to reach search results**.
 2. **404s still return HTTP 200 (#6 is partial).** A static SPA cannot return a real 404 status without a server function, and unknown product IDs can't be enumerated at build time. `noindex` is the available mitigation and Google treats it as authoritative.
-3. **Vercel routing is unverified in production.** The prerendered files and the `vercel.json` rewrites are correct locally, but `vite preview` does not resolve extensionless `/about` to a directory index the way Vercel does, so the routing itself could only be verified by inspecting the generated files, not by serving them at their real paths. **Confirm after deploy** — see §8.
-4. **JSON-LD opening hours are duplicated** from the `DEFAULT_CONTACT` fallback in `Contact.jsx`. That value is CMS-editable, so changing hours in the admin panel will not update the structured data. Noted in `structuredData.js`.
-5. **Lighthouse numbers are localhost.** Real figures over Cameroonian mobile networks will be worse. Field data from Search Console is the real measure.
+3. **Vercel routing is unverified in production.** The generated files are correct and were verified through a server that resolves paths the way Vercel documents, but only a real deploy proves it. Static routes are named explicitly in `vercel.json`; **shop routes are not** — they're data-driven and can't be enumerated in config, so they depend on Vercel's filesystem check running before rewrites. This deployment already demonstrates that ordering (`/assets/*.js` is served despite the same catch-all). If it ever failed, those pages would fall through to the SPA shell — today's behaviour, not a regression. **Confirm after deploy** — see §8.
+4. **Chrome may not run on Vercel's build image.** It has no Chrome preinstalled and doesn't cache `~/.cache/puppeteer`, so `.puppeteerrc.cjs` pins the download inside `node_modules`. If Chrome still can't launch, the snapshot pass logs a warning and every route keeps its head-only version — the build succeeds either way. **Check the build log** for `snapshotted 24/24` to confirm it actually ran in CI.
+5. **JSON-LD opening hours are duplicated** from the `DEFAULT_CONTACT` fallback in `Contact.jsx`. That value is CMS-editable, so changing hours in the admin panel will not update the structured data. Noted in `structuredData.js`.
+6. **Lighthouse numbers are localhost.** Real figures over Cameroonian mobile networks will be worse. Field data from Search Console is the real measure.
 
 ### Still open
 
@@ -280,14 +312,19 @@ One pre-existing lint error remains in `AdminGuard.jsx` (`react-hooks/set-state-
 
 These cannot be done from the codebase.
 
-1. **Deploy, then verify the routing.** The one thing local testing could not confirm. After deploy, check:
+1. **Check the build log** for `[prerender] snapshotted 24/24 bodies`. If it says Chrome couldn't launch, the deploy still succeeded but pages shipped without body HTML — tell me and I'll switch to a Vercel-compatible Chrome build.
+2. **Deploy, then verify the routing.** The one thing local testing could not confirm.
    ```
    curl -s https://www.telnetcameroon.org/services | grep -o '<title>[^<]*</title>'
    ```
-   It must return "Our Services — Telnet Cameroon", not the homepage title. Also confirm `/robots.txt` returns `text/plain` and `/sitemap.xml` returns `text/xml`. If `/services` still shows the homepage title, the `vercel.json` rewrites aren't taking effect — tell me and I'll adjust.
-2. **Google Search Console** — verify the **`www`** property (the apex 308-redirects to it, so `www` is the one that matters). Submit `https://www.telnetcameroon.org/sitemap.xml`.
-3. **Validate structured data** with Google's Rich Results Test against the deployed URLs. It needs a public URL, so it could not be run locally. Check the homepage (LocalBusiness + WebSite) and one product page (Product + BreadcrumbList).
-4. **Re-test social previews** with Facebook's Sharing Debugger and post a link in WhatsApp. Existing shared links may be cached with the old blank card and need a re-scrape.
-5. **Google Business Profile** — for a Buea local business this is probably a bigger ranking lever than anything in this repo. If one isn't claimed, claim it, and make the name, address and phone match `structuredData.js` exactly.
-6. **Decide on the contact form** (#21).
-7. **Target keywords and competitors** — the brief's CONTEXT block was left blank, so nothing here is keyword-targeted. Give me 3–5 terms and I can map them to pages and check whether the current copy actually supports them.
+   Must return "Our Services — Telnet Cameroon", not the homepage title. Then check a shop page — those rely on filesystem-before-rewrites rather than an explicit rule, so they're the likelier failure:
+   ```
+   curl -s https://www.telnetcameroon.org/shop/business-laptops | grep -c "Business Laptops"
+   ```
+   Also confirm `/robots.txt` returns `text/plain` and `/sitemap.xml` returns `text/xml`. If any of these fall back to the homepage, tell me and I'll adjust the config.
+3. **Google Search Console** — verify the **`www`** property (the apex 308-redirects to it, so `www` is the one that matters). Submit `https://www.telnetcameroon.org/sitemap.xml`.
+4. **Validate structured data** with Google's Rich Results Test against the deployed URLs. It needs a public URL, so it could not be run locally. Check the homepage (LocalBusiness + WebSite) and one product page (Product + BreadcrumbList).
+5. **Re-test social previews** with Facebook's Sharing Debugger and post a link in WhatsApp. Existing shared links may be cached with the old blank card and need a re-scrape.
+6. **Google Business Profile** — for a Buea local business this is probably a bigger ranking lever than anything in this repo. If one isn't claimed, claim it, and make the name, address and phone match `structuredData.js` exactly.
+7. **Decide on the contact form** (#21).
+8. **Target keywords and competitors** — the brief's CONTEXT block was left blank, so nothing here is keyword-targeted. Give me 3–5 terms and I can map them to pages and check whether the current copy actually supports them.
