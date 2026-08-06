@@ -17,7 +17,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { ROUTE_META, metaTagsToHtml, resolveMeta } from '../src/utils/seo.js'
+import { ROUTE_META, encodePath, metaTagsToHtml, resolveMeta } from '../src/utils/seo.js'
 import { jsonLdScript, siteGraph } from '../src/utils/structuredData.js'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -68,7 +68,16 @@ async function main() {
 
     for (const route of routes) {
         const meta = resolveMeta(route)
-        const head = `${metaTagsToHtml(meta)}\n${siteJsonLd}`
+        const parts = [metaTagsToHtml(meta)]
+
+        // Only the homepage declares one. A hero background set in CSS isn't
+        // discoverable until React mounts; this starts it with the bundle.
+        if (meta.preloadImage) {
+            parts.push(`    <link rel="preload" as="image" href="${encodePath(meta.preloadImage)}" fetchpriority="high" />`)
+        }
+
+        parts.push(siteJsonLd)
+        const head = parts.join('\n')
         const html = shell
             .replace(TITLE_RE, `<title>${escapeHtml(meta.title)}</title>`)
             .replace(PLACEHOLDER, head.trimStart())

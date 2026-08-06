@@ -6,6 +6,8 @@
 //
 // So it must stay free of React, JSX, and import.meta.env.
 
+import { HERO_FIRST_IMAGE } from './heroSlides.js'
+
 export const SITE_URL = 'https://www.telnetcameroon.org'
 export const SITE_NAME = 'Telnet Cameroon'
 export const LOCALE = 'en_US'
@@ -42,6 +44,10 @@ export const ROUTE_META = {
         title: 'Telnet Cameroon — IT Solutions & Laptops in Buea',
         description:
             'Telnet Cameroon provides quality, reliable digital solutions in Buea — laptop sales, CCTV installation, internet setup, tech training and IT consultancy.',
+        // The hero background is a CSS background-image, so the browser can't
+        // discover it until React has mounted. Preloading lets it download
+        // alongside the JS bundle instead of after it.
+        preloadImage: HERO_FIRST_IMAGE,
     },
     '/services': {
         title: 'Our Services — Telnet Cameroon',
@@ -83,11 +89,15 @@ export const ROUTE_META = {
 // Routes that must never be indexed.
 export const NOINDEX_ROUTES = ['/admin/login', '/admin']
 
+/** Percent-encodes each path segment — many asset filenames contain spaces. */
+export function encodePath(pathname = '/') {
+    const path = pathname.startsWith('/') ? pathname : `/${pathname}`
+    return path.split('/').map(encodeURIComponent).join('/').replace(/%2F/g, '/')
+}
+
 export function absoluteUrl(pathOrUrl = '/') {
     if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl
-    const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`
-    // Encode spaces and other unsafe characters left in legacy asset filenames.
-    return SITE_URL + path.split('/').map(encodeURIComponent).join('/').replace(/%2F/g, '/')
+    return SITE_URL + encodePath(pathOrUrl)
 }
 
 /**
@@ -111,6 +121,7 @@ export function resolveMeta(pathname = '/', overrides = {}) {
     const meta = {
         title: base.title,
         description: base.description,
+        preloadImage: base.preloadImage ?? null,
         canonical: canonicalFor(pathname),
         image: absoluteUrl(DEFAULT_OG_IMAGE.path),
         imageWidth: DEFAULT_OG_IMAGE.width,

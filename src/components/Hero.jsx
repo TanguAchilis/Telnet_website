@@ -2,34 +2,37 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import { fetchSiteStats } from '../utils/content'
+import { HERO_SLIDE_IMAGES } from '../utils/heroSlides'
 import './Hero.css'
 
 const DEFAULT_STATS = { happy_clients: '500+', interns_trained: '50+', years_experience: '3+' }
 
+// Background images live in utils/heroSlides.js so the build can preload the
+// first one. Order here must match that array.
 const slides = [
     {
-        image: '/Our team/other images/training sesseions.jpg',
+        image: HERO_SLIDE_IMAGES[0],
         badge: '🚀 Trusted by Schools, Homes & Businesses',
         title: <>Reliable Technology<br />Solutions for <span className="hero-highlight">School, Home & Businesses</span></>,
         desc: 'TELNET CAMEROON is a company dedicated to providing quality and reliable digital solutions and to help individuals and businesses stay connected and productive.',
         cta: { label: 'Explore Services', to: '/services' },
     },
     {
-        image: '/Our team/other images/camera installation practicals.jpeg',
+        image: HERO_SLIDE_IMAGES[1],
         badge: '🔒 Professional Security Solutions',
         title: <>Secure Your Property<br />with <span className="hero-highlight">CCTV Systems</span></>,
         desc: 'We provide expert installation of modern surveillance and security camera systems for homes, offices, schools, and businesses across Cameroon.',
         cta: { label: 'View Services', to: '/services' },
     },
     {
-        image: '/Our team/other images/practicals.jpeg',
+        image: HERO_SLIDE_IMAGES[2],
         badge: '🎓 Hands-On Learning Programs',
         title: <>Empowering the Next<br />Generation of <span className="hero-highlight">Tech Leaders</span></>,
         desc: 'Our training and internship programs equip young professionals with practical skills in networking, hardware maintenance, web development, and more.',
         cta: { label: 'Apply for Internship', to: '/internship' },
     },
     {
-        image: '/Our team/other images/laptop.jpg',
+        image: HERO_SLIDE_IMAGES[3],
         badge: '💻 Quality Devices at Fair Prices',
         title: <>Premium Laptops &<br /><span className="hero-highlight">Accessories</span> for All</>,
         desc: 'From student laptops to gaming rigs and business machines — we stock trusted brands like HP, Dell, Lenovo, and Acer with warranty and support.',
@@ -41,6 +44,11 @@ export default function Hero() {
     const [current, setCurrent] = useState(0)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [stats, setStats] = useState(DEFAULT_STATS)
+    // All four slide layers stay mounted so the crossfade still works, but a
+    // layer only gets its background-image once it's needed. Previously every
+    // slide's image downloaded on first paint — ~700 KB of the homepage's
+    // 959 KB of images, for three pictures nobody had scrolled to yet.
+    const [warmedSlides, setWarmedSlides] = useState(() => new Set([0]))
 
     useEffect(() => {
         let active = true
@@ -67,7 +75,42 @@ export default function Hero() {
         return () => clearInterval(timer)
     }, [nextSlide])
 
+    // Fetch the remaining slide images in one burst once the page has loaded.
+    //
+    // Warming them one-at-a-time per transition was measurably worse: it kept
+    // the network busy for the entire session, stretching Lighthouse's
+    // observation window from 3s to 10.4s and pushing Speed Index from 4.6s to
+    // 12.7s. Deferring past load keeps them out of first paint; doing them
+    // together lets the page go quiet again straight after.
+    useEffect(() => {
+        let idleHandle
+        let timeoutHandle
+
+        const warmAll = () => setWarmedSlides(new Set(slides.map((_, i) => i)))
+
+        const schedule = () => {
+            if (typeof requestIdleCallback === 'function') {
+                idleHandle = requestIdleCallback(warmAll, { timeout: 2000 })
+            } else {
+                timeoutHandle = setTimeout(warmAll, 500)
+            }
+        }
+
+        if (document.readyState === 'complete') schedule()
+        else window.addEventListener('load', schedule, { once: true })
+
+        return () => {
+            window.removeEventListener('load', schedule)
+            if (idleHandle !== undefined && typeof cancelIdleCallback === 'function') {
+                cancelIdleCallback(idleHandle)
+            }
+            if (timeoutHandle !== undefined) clearTimeout(timeoutHandle)
+        }
+    }, [])
+
     const slide = slides[current]
+    // Covers jumping straight to a cold slide via the dots.
+    const visibleSlides = warmedSlides.has(current) ? warmedSlides : new Set(warmedSlides).add(current)
 
     return (
         <section id="home" className="hero">
@@ -76,7 +119,7 @@ export default function Hero() {
                 <div
                     key={i}
                     className={`hero-slide-bg ${i === current ? 'active' : ''}`}
-                    style={{ backgroundImage: `url("${s.image}")` }}
+                    style={visibleSlides.has(i) ? { backgroundImage: `url("${s.image}")` } : undefined}
                 />
             ))}
             <div className="hero-overlay"></div>
