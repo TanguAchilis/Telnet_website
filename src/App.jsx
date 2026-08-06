@@ -14,6 +14,7 @@ import ShopCategoryPage from './pages/ShopCategoryPage'
 import ShopProductPage from './pages/ShopProductPage'
 import ContactPage from './pages/ContactPage'
 import InternshipPage from './pages/InternshipPage'
+import NotFoundPage from './pages/NotFoundPage'
 import WhatsAppFloat from './components/WhatsAppFloat'
 // Admin
 import AdminGuard from './components/admin/AdminGuard'
@@ -103,6 +104,9 @@ function App() {
           <Route path="/shop/:categorySlug/:productId" element={<ShopProductPage />} />
           <Route path="/internship" element={<InternshipPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          {/* Unknown URLs previously rendered nothing at all — a blank page
+              with a 200. Keep this last so it only catches real misses. */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
 
         {/* Admin routes — no public layout */}
