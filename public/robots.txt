@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Admin portal — no reason to crawl or index it.
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://www.telnetcameroon.org/sitemap.xml

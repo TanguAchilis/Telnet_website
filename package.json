@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run seo:prerender",
+    "build": "vite build && npm run seo:prerender && npm run seo:sitemap",
     "seo:prerender": "node scripts/prerender.js",
+    "seo:sitemap": "node scripts/sitemap.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
