@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signInAdmin } from '../../utils/admin'
+import { useSeo } from '../../utils/useSeo'
 import './AdminLogin.css'
 
 export default function AdminLogin() {
     const navigate = useNavigate()
+
+    useSeo({
+        title: 'Admin Login — Telnet Cameroon',
+        description: 'Administration area.',
+        noindex: true,
+    })
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
