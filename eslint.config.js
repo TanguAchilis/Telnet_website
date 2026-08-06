@@ -27,8 +27,8 @@ export default defineConfig([
     },
   },
   {
-    // Build scripts run under Node, not the browser.
-    files: ['scripts/**/*.js'],
+    // Build scripts and Vercel serverless functions run under Node, not the browser.
+    files: ['scripts/**/*.js', 'api/**/*.js'],
     languageOptions: {
       globals: globals.node,
     },
