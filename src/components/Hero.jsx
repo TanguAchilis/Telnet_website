@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import { fetchSiteStats } from '../utils/content'
 import { HERO_SLIDE_IMAGES } from '../utils/heroSlides'
+import { IS_PRERENDER } from '../utils/isPrerender'
 import './Hero.css'
 
 const DEFAULT_STATS = { happy_clients: '500+', interns_trained: '50+', years_experience: '3+' }
@@ -69,8 +70,10 @@ export default function Hero() {
         goToSlide((current + 1) % slides.length)
     }, [current, goToSlide])
 
-    // Auto-advance
+    // Auto-advance. Frozen during prerender so the captured HTML always shows
+    // slide 1 — otherwise the indexed <h1> depends on how long the snapshot took.
     useEffect(() => {
+        if (IS_PRERENDER) return undefined
         const timer = setInterval(nextSlide, 6000)
         return () => clearInterval(timer)
     }, [nextSlide])
@@ -83,6 +86,11 @@ export default function Hero() {
     // 12.7s. Deferring past load keeps them out of first paint; doing them
     // together lets the page go quiet again straight after.
     useEffect(() => {
+        // Skipped during prerender: warming would inline all four background
+        // images into the static HTML, so every visitor would download them on
+        // first paint — exactly what deferring them was meant to avoid.
+        if (IS_PRERENDER) return undefined
+
         let idleHandle
         let timeoutHandle
 
