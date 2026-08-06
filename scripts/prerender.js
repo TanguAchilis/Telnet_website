@@ -18,6 +18,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { ROUTE_META, metaTagsToHtml, resolveMeta } from '../src/utils/seo.js'
+import { jsonLdScript, siteGraph } from '../src/utils/structuredData.js'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = join(ROOT, 'dist')
@@ -61,11 +62,16 @@ async function main() {
     const routes = Object.keys(ROUTE_META)
     const written = []
 
+    // Same graph on every page; useJsonLd('site', ...) adopts this node at
+    // runtime by id rather than appending a second copy.
+    const siteJsonLd = jsonLdScript(siteGraph(), 'jsonld-site')
+
     for (const route of routes) {
         const meta = resolveMeta(route)
+        const head = `${metaTagsToHtml(meta)}\n${siteJsonLd}`
         const html = shell
             .replace(TITLE_RE, `<title>${escapeHtml(meta.title)}</title>`)
-            .replace(PLACEHOLDER, metaTagsToHtml(meta).trimStart())
+            .replace(PLACEHOLDER, head.trimStart())
 
         // '/' overwrites the shell itself; every other route gets a directory
         // index, which Vercel serves at both /route and /route/.

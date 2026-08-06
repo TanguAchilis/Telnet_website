@@ -221,7 +221,13 @@ export function shopCategoryMeta(categoryName, categoryDescription, pathname) {
 }
 
 export function shopProductMeta(product, categoryName, pathname) {
-    const brandPrefix = product.brand ? `${product.brand} ` : ''
+    // Most product names already lead with the brand ("HP EliteBook 840 G5"),
+    // so prefixing unconditionally produced "HP HP EliteBook 840 G5".
+    const name = product.name ?? ''
+    const startsWithBrand =
+        product.brand && name.toLowerCase().startsWith(product.brand.toLowerCase())
+    const displayName = product.brand && !startsWithBrand ? `${product.brand} ${name}` : name
+
     const parts = []
     if (product.brand) parts.push(product.brand)
     if (product.condition) parts.push(product.condition)
@@ -229,12 +235,12 @@ export function shopProductMeta(product, categoryName, pathname) {
 
     const descriptionSource =
         product.description ||
-        `${brandPrefix}${product.name} available from Telnet Cameroon in Buea${
+        `${displayName} available from Telnet Cameroon in Buea${
             parts.length ? ` — ${parts.join(', ')}` : ''
         }. Message us on WhatsApp to check availability.`
 
     return resolveMeta(pathname, {
-        title: truncate(`${brandPrefix}${product.name} | ${SITE_NAME}`, 60),
+        title: truncate(`${displayName} | ${SITE_NAME}`, 60),
         description: truncate(descriptionSource),
         image: product.image_url || DEFAULT_OG_IMAGE.path,
         imageAlt: product.name,

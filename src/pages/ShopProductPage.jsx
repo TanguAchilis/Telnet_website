@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchShopProduct, formatPrice } from '../utils/content'
 import { getWhatsAppUrl } from '../utils/whatsapp'
 import { resolveMeta, shopProductMeta } from '../utils/seo'
-import { useSeo } from '../utils/useSeo'
+import { breadcrumbSchema, productSchema } from '../utils/structuredData'
+import { useJsonLd, useSeo } from '../utils/useSeo'
 import './ShopFlow.css'
 
 export default function ShopProductPage() {
@@ -39,6 +40,19 @@ export default function ShopProductPage() {
                   description: 'This item may no longer be available. Browse our shop or message us on WhatsApp to ask what is in stock.',
                   noindex: true,
               })
+    )
+
+    useJsonLd('product', product ? productSchema(product, product.category?.name, seoPath) : null)
+    useJsonLd(
+        'breadcrumb',
+        product
+            ? breadcrumbSchema([
+                { name: 'Home', path: '/' },
+                { name: 'Shop', path: '/shop' },
+                { name: product.category?.name || 'Shop', path: `/shop/${product.category?.slug || categorySlug}` },
+                { name: product.name, path: seoPath },
+            ])
+            : null
     )
 
     if (loading) {
