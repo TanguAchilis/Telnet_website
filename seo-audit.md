@@ -1,6 +1,6 @@
 # SEO Audit — Telnet Cameroon
 
-**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `856a56d`
+**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `7c4c15c`
 
 > §1–§6 are the original audit, left as written. **§7 records what was implemented and measured; §8 is what you must do manually.**
 
@@ -200,7 +200,7 @@ I cannot determine these from the source, so I am not guessing at them.
 
 ## 7. Phase 2 — implementation
 
-Approved 2026-08-06. Eleven commits on `main`, one concern each, no drive-by refactors.
+Approved 2026-08-06. Thirteen commits on `main`, one concern each, no drive-by refactors.
 
 **One dependency added, with approval:** `puppeteer` (devDependency), for the body-prerendering pass in §7.1. Everything else is zero-dependency.
 
@@ -217,6 +217,8 @@ Approved 2026-08-06. Eleven commits on `main`, one concern each, no drive-by ref
 | `ebe8068` | Prerender real body HTML with headless Chrome | #1 |
 | `856a56d` | Prerender shop category and product pages | #1 |
 | `2868374` | ESLint Node globals for the build scripts | — |
+| `8a29c65` | "Publish changes" button — rebuild on demand | §7.3 |
+| `7c4c15c` | Nightly cron rebuild backstop | §7.3 |
 
 ### Architecture
 
@@ -269,6 +271,20 @@ No Lighthouse SEO audits fail.
 
 **Correction to an earlier figure.** The hero commit reported images dropping from 959 KB/6 requests to 781 KB/4. Comparing the actual network logs, the requests are **identical** in both builds — the smaller reading was a shorter Lighthouse observation window, not fewer bytes. The hero change moves roughly 700 KB *out of the critical path* (the deferred images now load after the load event, which is what the 23% LCP gain reflects); it does not reduce total bytes downloaded.
 
+### 7.3 Keeping the snapshot fresh without a manual deploy
+
+Prerendering trades freshness for crawlability: the static HTML is a build-time copy, so a CMS edit wouldn't reach a search snippet or a WhatsApp card until the next deploy. Two mechanisms close that gap.
+
+**Publish button** (`8a29c65`). The admin topbar has a *Publish changes* button that triggers a Vercel rebuild — about 90 seconds from click to live. It calls a Supabase Edge Function rather than the deploy hook directly, because **the hook URL is a credential**: anyone holding it can queue builds, and Vite inlines every `VITE_*` variable into the public bundle, so a hook URL referenced from client code would be readable by any visitor. The function verifies `app_metadata.role === 'admin'` using the same pattern as the existing `create-admin-user` function, then POSTs. Verified: `api.vercel.com` appears nowhere in `dist/`.
+
+A 60-second cooldown stops a double-click queueing two builds, and it's recorded only *after* Vercel accepts, so a failed attempt doesn't start a cooldown the admin then waits out for nothing.
+
+**Nightly cron** (`7c4c15c`). `api/rebuild.js` hits the same hook on a daily schedule, as a backstop for when nobody clicks Publish. It fails closed — without `CRON_SECRET` it refuses every request rather than becoming a public build trigger. The SPA catch-all rewrite became `/((?!api/).*)` so it stops swallowing the endpoint.
+
+**Both are inert until configured.** Setup is two steps and both are outside the repo — see [`supabase/functions/trigger-rebuild/README.md`](supabase/functions/trigger-rebuild/README.md). Until then the button returns a `503` naming the exact command to run, and the site is otherwise unaffected.
+
+**What a rebuild still cannot fix:** WhatsApp and Facebook cache link previews after first scrape. A link already shared keeps its old card until re-scraped through Facebook's Sharing Debugger — that's true regardless of how fresh the origin is, and it would still be true under full SSR.
+
 ### Verified in the generated output
 
 - All 8 static routes ship a unique `<title>`, description, and canonical **in the built HTML**, not just after hydration.
@@ -282,7 +298,7 @@ No Lighthouse SEO audits fail.
 
 ### Known limitations — deliberately not papered over
 
-1. **Prerendered content goes stale between deploys.** The snapshot is a point-in-time copy of CMS data. Edit a product in the admin panel and the static HTML keeps the old text until the next deploy. Visitors always see live data (React re-renders on mount); only crawlers see the snapshot. Standard for any SSG setup, but it means **content changes need a redeploy to reach search results**.
+1. ~~**Prerendered content goes stale between deploys.**~~ ✅ **Addressed** — see §7.3. The snapshot is still point-in-time, but a **Publish changes** button in the admin topbar rebuilds on demand (~90 s), and a nightly cron caps staleness at 24 h if nobody clicks it. Visitors were never affected; only crawlers read the snapshot.
 2. **404s still return HTTP 200 (#6 is partial).** A static SPA cannot return a real 404 status without a server function, and unknown product IDs can't be enumerated at build time. `noindex` is the available mitigation and Google treats it as authoritative.
 3. **Vercel routing is unverified in production.** The generated files are correct and were verified through a server that resolves paths the way Vercel documents, but only a real deploy proves it. Static routes are named explicitly in `vercel.json`; **shop routes are not** — they're data-driven and can't be enumerated in config, so they depend on Vercel's filesystem check running before rewrites. This deployment already demonstrates that ordering (`/assets/*.js` is served despite the same catch-all). If it ever failed, those pages would fall through to the SPA shell — today's behaviour, not a regression. **Confirm after deploy** — see §8.
 4. **Chrome may not run on Vercel's build image.** It has no Chrome preinstalled and doesn't cache `~/.cache/puppeteer`, so `.puppeteerrc.cjs` pins the download inside `node_modules`. If Chrome still can't launch, the snapshot pass logs a warning and every route keeps its head-only version — the build succeeds either way. **Check the build log** for `snapshotted 24/24` to confirm it actually ran in CI.
@@ -326,5 +342,6 @@ These cannot be done from the codebase.
 4. **Validate structured data** with Google's Rich Results Test against the deployed URLs. It needs a public URL, so it could not be run locally. Check the homepage (LocalBusiness + WebSite) and one product page (Product + BreadcrumbList).
 5. **Re-test social previews** with Facebook's Sharing Debugger and post a link in WhatsApp. Existing shared links may be cached with the old blank card and need a re-scrape.
 6. **Google Business Profile** — for a Buea local business this is probably a bigger ranking lever than anything in this repo. If one isn't claimed, claim it, and make the name, address and phone match `structuredData.js` exactly.
-7. **Decide on the contact form** (#21).
-8. **Target keywords and competitors** — the brief's CONTEXT block was left blank, so nothing here is keyword-targeted. Give me 3–5 terms and I can map them to pages and check whether the current copy actually supports them.
+7. **Set up publishing** (two steps, both outside the repo) — create the Vercel deploy hook and set `VERCEL_DEPLOY_HOOK_URL` + `CRON_SECRET`. Full instructions in [`supabase/functions/trigger-rebuild/README.md`](supabase/functions/trigger-rebuild/README.md). Until this is done, CMS edits still need a manual redeploy to reach crawlers.
+8. **Decide on the contact form** (#21).
+9. **Target keywords and competitors** — the brief's CONTEXT block was left blank, so nothing here is keyword-targeted. Give me 3–5 terms and I can map them to pages and check whether the current copy actually supports them.
