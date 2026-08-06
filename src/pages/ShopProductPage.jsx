@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchShopProduct, formatPrice } from '../utils/content'
 import { getWhatsAppUrl } from '../utils/whatsapp'
+import { resolveMeta, shopProductMeta } from '../utils/seo'
+import { useSeo } from '../utils/useSeo'
 import './ShopFlow.css'
 
 export default function ShopProductPage() {
@@ -24,6 +26,20 @@ export default function ShopProductPage() {
             .finally(() => { if (active) setLoading(false) })
         return () => { active = false }
     }, [productId])
+
+    // Called before the early returns below so hook order stays stable.
+    const seoPath = `/shop/${product?.category?.slug || categorySlug}/${productId}`
+    useSeo(
+        product
+            ? shopProductMeta(product, product.category?.name, seoPath)
+            : loading
+              ? null // still fetching — don't advertise a title we may have to retract
+              : resolveMeta(seoPath, {
+                  title: 'Product not found — Telnet Cameroon',
+                  description: 'This item may no longer be available. Browse our shop or message us on WhatsApp to ask what is in stock.',
+                  noindex: true,
+              })
+    )
 
     if (loading) {
         return (

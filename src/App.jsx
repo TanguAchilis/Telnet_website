@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation }
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
+import { useStaticRouteSeo } from './utils/useSeo'
 import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
 import AboutPage from './pages/AboutPage'
@@ -68,6 +69,10 @@ function AnimationObserver() {
 }
 
 function PublicLayout() {
+  // Covers the eight static public routes. Shop category/product and the 404
+  // page set their own metadata — see useStaticRouteSeo.
+  useStaticRouteSeo()
+
   return (
     <>
       <Navbar />
