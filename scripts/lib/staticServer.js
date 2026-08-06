@@ -73,7 +73,17 @@ export function startStaticServer(root) {
             const { port } = server.address()
             resolve({
                 origin: `http://127.0.0.1:${port}`,
-                close: () => new Promise((done) => server.close(done)),
+                close: () =>
+                    new Promise((done) => {
+                        // server.close() only stops new connections and waits for
+                        // existing ones to drain. Chrome holds keep-alive sockets
+                        // open, so without closeAllConnections() the callback may
+                        // never fire and the build hangs after a successful
+                        // snapshot — intermittently, depending on whether the
+                        // browser happened to release its sockets first.
+                        server.close(done)
+                        server.closeAllConnections?.()
+                    }),
             })
         })
     })

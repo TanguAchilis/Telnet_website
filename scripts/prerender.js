@@ -22,8 +22,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { ROUTE_META, encodePath, metaTagsToHtml, resolveMeta } from '../src/utils/seo.js'
-import { jsonLdScript, siteGraph } from '../src/utils/structuredData.js'
+import {
+    ROUTE_META,
+    encodePath,
+    metaTagsToHtml,
+    resolveMeta,
+    shopCategoryMeta,
+    shopProductMeta,
+} from '../src/utils/seo.js'
+import { breadcrumbSchema, jsonLdScript, productSchema, siteGraph } from '../src/utils/structuredData.js'
+import { fetchShopRoutes, loadSupabaseEnv } from './lib/shopRoutes.js'
 import { startStaticServer } from './lib/staticServer.js'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -88,22 +96,96 @@ async function main() {
         }
 
         parts.push(siteJsonLd)
-        const head = parts.join('\n')
-        const html = shell
-            .replace(TITLE_RE, `<title>${escapeHtml(meta.title)}</title>`)
-            .replace(PLACEHOLDER, head.trimStart())
-
-        // '/' overwrites the shell itself; every other route gets a directory
-        // index, which Vercel serves at both /route and /route/.
-        const outPath = route === '/' ? shellPath : join(DIST, route, 'index.html')
-        await mkdir(dirname(outPath), { recursive: true })
-        await writeFile(outPath, html, 'utf8')
+        await writeShell(shell, route, parts.join('\n'), meta.title)
         written.push(route)
     }
 
-    console.log(`[prerender] wrote ${written.length} routes: ${written.join(', ')}`)
+    console.log(`[prerender] wrote ${written.length} static routes: ${written.join(', ')}`)
     await assertVercelRoutesInSync(written)
-    await snapshotBodies(written)
+
+    // Shop URLs are data-driven, so they can't be listed in vercel.json. They
+    // rely on Vercel's filesystem check running before rewrites — which this
+    // deployment already demonstrates, since /assets/*.js is served despite the
+    // same catch-all. If it ever didn't, these would fall through to the SPA
+    // shell: today's behaviour, not a regression.
+    const shopRoutes = await writeShopShells(shell, siteJsonLd)
+
+    await snapshotBodies([...written, ...shopRoutes])
+}
+
+/** '/' overwrites the shell itself; other routes get a directory index. */
+async function writeShell(shell, route, head, title) {
+    const outPath = route === '/' ? join(DIST, 'index.html') : join(DIST, route, 'index.html')
+    const html = shell
+        .replace(TITLE_RE, `<title>${escapeHtml(title)}</title>`)
+        .replace(PLACEHOLDER, head.trimStart())
+    await mkdir(dirname(outPath), { recursive: true })
+    await writeFile(outPath, html, 'utf8')
+}
+
+/**
+ * Writes shells for every shop category and product, with per-item metadata
+ * and JSON-LD built from the same functions the runtime uses — so a product's
+ * static HTML carries its own title, description, OG image and Product schema
+ * rather than the homepage fallback.
+ *
+ * Returns the paths written, or [] if Supabase couldn't be reached.
+ */
+async function writeShopShells(shell, siteJsonLd) {
+    const env = await loadSupabaseEnv()
+    if (!env.url || !env.key) {
+        console.warn('[prerender] no Supabase credentials — shop routes not prerendered.')
+        return []
+    }
+
+    let data
+    try {
+        data = await fetchShopRoutes(env)
+    } catch (error) {
+        console.warn(`[prerender] Supabase query failed (${error.message}) — shop routes not prerendered.`)
+        return []
+    }
+
+    const paths = []
+
+    for (const category of data.categories) {
+        const meta = shopCategoryMeta(category.name, category.description, category.path)
+        const crumbs = breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Shop', path: '/shop' },
+            { name: category.name, path: category.path },
+        ])
+        const head = [
+            metaTagsToHtml(meta),
+            siteJsonLd,
+            jsonLdScript(crumbs, 'jsonld-breadcrumb'),
+        ].join('\n')
+        await writeShell(shell, category.path, head, meta.title)
+        paths.push(category.path)
+    }
+
+    for (const entry of data.products) {
+        const meta = shopProductMeta(entry.product, entry.categoryName, entry.path)
+        const crumbs = breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Shop', path: '/shop' },
+            { name: entry.categoryName, path: `/shop/${entry.categorySlug}` },
+            { name: entry.product.name, path: entry.path },
+        ])
+        const head = [
+            metaTagsToHtml(meta),
+            siteJsonLd,
+            jsonLdScript(productSchema(entry.product, entry.categoryName, entry.path), 'jsonld-product'),
+            jsonLdScript(crumbs, 'jsonld-breadcrumb'),
+        ].join('\n')
+        await writeShell(shell, entry.path, head, meta.title)
+        paths.push(entry.path)
+    }
+
+    console.log(
+        `[prerender] wrote ${paths.length} shop routes (${data.categories.length} categories, ${data.products.length} products)`
+    )
+    return paths
 }
 
 /**
