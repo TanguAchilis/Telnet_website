@@ -153,21 +153,46 @@ export async function saveCurrentAdminProfile(updates) {
         .single()
 }
 
-export async function createAdminUser(email, password) {
+async function callEdgeFunction(name, body) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) throw new Error('Not authenticated.')
 
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-user`
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${name}`
     const res = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(body ?? {}),
     })
 
-    const result = await res.json()
-    if (!res.ok) throw new Error(result.error || 'Failed to create admin user.')
+    const result = await res.json().catch(() => ({}))
+    if (!res.ok) {
+        // `message` covers Supabase's own envelope — a function that hasn't been
+        // deployed yet returns that shape, not ours.
+        const error = new Error(result.error || result.message || `${name} failed (${res.status}).`)
+        error.status = res.status
+        throw error
+    }
+    return result
+}
+
+export async function createAdminUser(email, password) {
+    const result = await callEdgeFunction('create-admin-user', { email, password })
     return result.user
+}
+
+// ---------------------------------------------------------------------------
+// Publishing
+// ---------------------------------------------------------------------------
+
+/**
+ * Rebuilds the site so CMS edits reach search engines and link previews.
+ *
+ * Visitors already see live data; this is only about the prerendered HTML that
+ * crawlers and social scrapers read. See supabase/functions/trigger-rebuild.
+ */
+export async function triggerRebuild() {
+    return callEdgeFunction('trigger-rebuild')
 }
