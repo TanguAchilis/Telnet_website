@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run seo:prerender && npm run seo:sitemap",
+    "build": "vite build && npm run seo:browser && npm run seo:prerender && npm run seo:sitemap",
+    "seo:browser": "puppeteer browsers install chrome || echo \"[seo:browser] Chromium install failed — prerender will fall back to head-only output.\"",
     "seo:prerender": "node scripts/prerender.js",
     "seo:sitemap": "node scripts/sitemap.js",
     "lint": "eslint .",
