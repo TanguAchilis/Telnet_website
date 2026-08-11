@@ -1,24 +1,24 @@
 import { useEffect, useState } from 'react'
 import { fetchContactInfo } from './content'
-import { readInjectedContact } from './siteContact'
+import { getSiteContact, setSiteContact } from './siteContact'
 import { setWhatsAppNumber } from './whatsapp'
 
-// Seed every WhatsApp link from the prerendered value before React even mounts,
-// so the very first render is correct rather than showing the fallback.
-setWhatsAppNumber(readInjectedContact()?.whatsapp)
+// Seed the WhatsApp helper from the prerendered value before React mounts, so
+// the very first render is correct rather than showing the fallback.
+setWhatsAppNumber(getSiteContact().whatsapp)
 
 /**
- * The admin-editable contact record, for whatever needs it this render.
+ * The admin-editable contact record — phone, email, address, hours, WhatsApp.
  *
  * Starts from the value baked into the page at build time and refreshes from
  * Supabase on mount, so edits made since the last publish still reach visitors.
- * Also keeps the WhatsApp helper's module-level number in step — getWhatsAppUrl()
- * is called by a dozen components that would otherwise each need this wiring.
  *
- * Called once, in PublicLayout.
+ * Called once, in PublicLayout. Navbar, Footer and Contact read the same values
+ * through getSiteContact() rather than props: this hook's state update
+ * re-renders the layout, and they re-render with it.
  */
 export function useSiteContact() {
-    const [contact, setContact] = useState(readInjectedContact)
+    const [contact, setContact] = useState(getSiteContact)
 
     useEffect(() => {
         let active = true
@@ -26,9 +26,7 @@ export function useSiteContact() {
             .then((info) => {
                 if (!active || !info) return
                 setWhatsAppNumber(info.whatsapp)
-                // Replacing the object re-renders the layout, which rebuilds the
-                // hrefs its children produced from the module-level number.
-                setContact(info)
+                if (setSiteContact(info)) setContact(getSiteContact())
             })
             .catch(() => { /* keep the build-time value */ })
         return () => { active = false }

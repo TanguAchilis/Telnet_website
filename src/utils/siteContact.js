@@ -5,10 +5,46 @@
 // anything a non-JS crawler reads — already carries the real values instead of
 // the fallbacks compiled into the bundle.
 
+/**
+ * The one set of fallbacks for contact details, used when the stored record is
+ * missing or unreachable. Everything else — seo.js, whatsapp.js, Contact.jsx —
+ * derives from here rather than keeping its own copy, which is how the previous
+ * three copies managed to drift apart and start publishing a dead phone number.
+ *
+ * These mirror the stored record. The CMS still wins whenever it loads.
+ */
+export const CONTACT_FALLBACK = {
+    phone: '+237 679 837 395',
+    email: 'info@telnetcameroon.org',
+    address: 'Tarred Malingo, behind Amazing Pharmacy, Molyko-Buea / St Claire',
+    whatsapp: '237679837395',
+    hours: 'Mon – Fri: 8am – 6pm\nSaturday: 9am – 4pm',
+}
+
 /** The build-time seed, or null when the page wasn't prerendered with one. */
 export function readInjectedContact() {
     if (typeof window === 'undefined') return null
     return window.__TELNET_CONTACT__ ?? null
+}
+
+// Module-level so Navbar, Footer and Contact can read it during render without
+// context plumbing. useSiteContact() keeps it current; because that hook lives
+// in PublicLayout, an update re-renders the whole public tree and every
+// consumer picks up the new value.
+let currentContact = { ...CONTACT_FALLBACK, ...(readInjectedContact() ?? {}) }
+
+/** Current contact details: stored values over fallbacks, never partial. */
+export function getSiteContact() {
+    return currentContact
+}
+
+/** Returns true if anything actually changed, so callers can skip a re-render. */
+export function setSiteContact(contact) {
+    if (!contact) return false
+    const next = { ...CONTACT_FALLBACK, ...contact }
+    const changed = Object.keys(next).some((k) => next[k] !== currentContact[k])
+    if (changed) currentContact = next
+    return changed
 }
 
 const DAYS = {

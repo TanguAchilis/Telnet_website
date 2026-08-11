@@ -7,8 +7,10 @@
 // across the navbar, hero, footer, floating button, services, shop, product
 // pages and the 404.
 
+import { CONTACT_FALLBACK, getSiteContact } from './siteContact.js'
+
 /** Used before the stored value loads, and if it's unset or unreachable. */
-export const DEFAULT_WHATSAPP_NUMBER = '237679837395'
+export const DEFAULT_WHATSAPP_NUMBER = CONTACT_FALLBACK.whatsapp
 
 /** wa.me wants digits only — strips '+', spaces and punctuation. */
 export function normalizeWhatsAppNumber(value) {
@@ -16,12 +18,10 @@ export function normalizeWhatsAppNumber(value) {
     return digits || null
 }
 
-// scripts/prerender.js seeds window.__TELNET_CONTACT__ with the stored contact
-// record, so the first render already has the right number instead of showing
-// the fallback until the runtime fetch resolves.
-let currentNumber =
-    (typeof window !== 'undefined' && normalizeWhatsAppNumber(window.__TELNET_CONTACT__?.whatsapp)) ||
-    DEFAULT_WHATSAPP_NUMBER
+// getSiteContact() already merges the value scripts/prerender.js seeds into the
+// page, so the first render has the right number rather than showing the
+// fallback until the runtime fetch resolves.
+let currentNumber = normalizeWhatsAppNumber(getSiteContact().whatsapp) || DEFAULT_WHATSAPP_NUMBER
 
 export function getWhatsAppNumber() {
     return currentNumber

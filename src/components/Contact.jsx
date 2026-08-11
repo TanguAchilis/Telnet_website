@@ -1,28 +1,16 @@
-import { useEffect, useState } from 'react'
-import { DEFAULT_WHATSAPP_NUMBER, getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
-import { fetchContactInfo } from '../utils/content'
+import { useState } from 'react'
+import { getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
+import { getSiteContact } from '../utils/siteContact'
 import './Contact.css'
-
-const DEFAULT_CONTACT = {
-    phone: '+237 671 827 893 / 674 410 358',
-    email: 'telnetinc23@gmail.com',
-    address: 'Tarred Malingo, behind Amazing Pharmacy, Molyko-Buea / St Claire',
-    whatsapp: DEFAULT_WHATSAPP_NUMBER,
-    hours: 'Tue – Fri: 8am – 7pm\nSaturday: 9am – 6pm',
-}
 
 export default function Contact({ showHeader = true }) {
     const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', subject: '', message: '' })
     const [submitted, setSubmitted] = useState(false)
-    const [contact, setContact] = useState(DEFAULT_CONTACT)
 
-    useEffect(() => {
-        let active = true
-        fetchContactInfo()
-            .then((val) => { if (active && val) setContact({ ...DEFAULT_CONTACT, ...val }) })
-            .catch(() => { /* keep defaults */ })
-        return () => { active = false }
-    }, [])
+    // Loaded once in PublicLayout via useSiteContact. This component used to
+    // fetch the same record again and keep its own defaults, which is how its
+    // copy drifted from the stored values.
+    const contact = getSiteContact()
 
     // Built by the shared helper rather than assembled here, so this link can't
     // drift from the dozen other WhatsApp buttons on the site.

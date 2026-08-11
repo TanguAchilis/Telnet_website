@@ -7,6 +7,7 @@
 // So it must stay free of React, JSX, and import.meta.env.
 
 import { HERO_FIRST_IMAGE } from './heroSlides.js'
+import { CONTACT_FALLBACK } from './siteContact.js'
 
 export const SITE_URL = 'https://www.telnetcameroon.org'
 export const SITE_NAME = 'Telnet Cameroon'
@@ -20,20 +21,23 @@ export const DEFAULT_OG_IMAGE = {
     alt: 'Telnet Cameroon technicians installing security camera systems',
 }
 
-// Business details, kept in sync with the defaults in src/components/Contact.jsx.
+// Structural details that aren't editable in the CMS. Anything the admin panel
+// *can* change — phone, email, address, hours, WhatsApp — comes from
+// CONTACT_FALLBACK so there's one copy to keep honest, and the stored record
+// overrides it at build and runtime anyway.
 export const BUSINESS = {
     name: 'Telnet Cameroon',
     legalName: 'TELNET CAMEROON',
-    phone: '+237671827893',
-    email: 'telnetinc23@gmail.com',
-    streetAddress: 'Tarred Malingo, behind Amazing Pharmacy',
+    phone: CONTACT_FALLBACK.phone,
+    email: CONTACT_FALLBACK.email,
+    streetAddress: CONTACT_FALLBACK.address,
     addressLocality: 'Buea',
     addressRegion: 'South-West',
     addressCountry: 'CM',
-    whatsapp: '237671827893',
+    whatsapp: CONTACT_FALLBACK.whatsapp,
     openingHours: [
-        { days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '19:00' },
-        { days: ['Saturday'], opens: '09:00', closes: '18:00' },
+        { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '18:00' },
+        { days: ['Saturday'], opens: '09:00', closes: '16:00' },
     ],
 }
 
