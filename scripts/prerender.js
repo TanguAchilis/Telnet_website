@@ -238,8 +238,9 @@ async function snapshotBodies(routes) {
     let puppeteer
     try {
         ;({ default: puppeteer } = await import('puppeteer'))
-    } catch {
+    } catch (error) {
         console.warn('[prerender] puppeteer not installed — keeping head-only output.')
+        await writeReport({ ok: false, reason: 'puppeteer-not-installed', detail: error.message, routes: routes.length })
         return
     }
 
@@ -256,6 +257,12 @@ async function snapshotBodies(routes) {
             `[prerender] could not launch Chrome (${error.message.split('\n')[0]}) — keeping head-only output.\n` +
                 '            Pages still ship correct metadata; only the rendered body is missing.'
         )
+        await writeReport({
+            ok: false,
+            reason: 'chrome-launch-failed',
+            detail: error.message.split('\n').slice(0, 4).join(' | '),
+            routes: routes.length,
+        })
         return
     }
 
@@ -284,9 +291,31 @@ async function snapshotBodies(routes) {
         if (failed.length) {
             console.warn(`[prerender] head-only fallback for: ${failed.join(', ')}`)
         }
+        await writeReport({ ok: failed.length === 0, snapshotted: ok.length, routes: routes.length, failed })
     } finally {
         await browser.close().catch(() => {})
         await server?.close().catch(() => {})
+    }
+}
+
+/**
+ * Writes the snapshot outcome to dist/_seo-prerender.json.
+ *
+ * The body snapshot degrades silently by design, which makes a partial failure
+ * invisible from outside — and Vercel build logs aren't always reachable by
+ * whoever needs to diagnose it. Publishing the outcome alongside the site means
+ * `curl <url>/_seo-prerender.json` answers "did prerendering work?" without any
+ * dashboard access. Counts and an error string only; nothing sensitive.
+ */
+async function writeReport(report) {
+    try {
+        await writeFile(
+            join(DIST, '_seo-prerender.json'),
+            `${JSON.stringify({ ...report, generatedBy: 'scripts/prerender.js' }, null, 2)}\n`,
+            'utf8'
+        )
+    } catch {
+        // A missing diagnostic must never fail the build.
     }
 }
 
@@ -333,15 +362,19 @@ async function injectBody(route, body) {
  * Two things about vercel.json worth knowing before editing it, since the file
  * is strict JSON and can't hold comments of its own:
  *
- *   1. The catch-all must stay a plain `/(.*)`. A `/((?!api/).*)` negative
- *      lookahead was tried and silently matched nothing once deployed, so every
- *      route that isn't prerendered hard-404ed instead of falling back to the
- *      SPA. Vercel compiles `source` with path-to-regexp, not JS RegExp. The
- *      exclusion isn't needed anyway: the filesystem — static files and api/
- *      functions alike — is resolved before rewrites, so /api/rebuild is
- *      reached regardless.
+ *   1. The catch-all must stay a plain `/(.*)` with destination `/`, NOT
+ *      `/index.html`. Under `cleanUrls: true` Vercel 308-redirects
+ *      `/index.html` to `/`, so a rewrite pointing there resolves to nothing
+ *      and every unmatched route hard-404s instead of falling back to the SPA.
+ *      A `/((?!api/).*)` source was also tried and silently matched nothing —
+ *      Vercel compiles `source` with path-to-regexp, not JS RegExp. That
+ *      exclusion isn't needed anyway: the filesystem, static files and api/
+ *      functions alike, resolves before rewrites.
  *   2. Unknown top-level keys fail schema validation and break the build. There
  *      is nowhere in that file to leave a note; leave it here.
+ *   3. `cleanUrls: true` is what lets prerendered directory indexes resolve at
+ *      their clean paths, including the data-driven shop routes that can't be
+ *      listed here. The per-route rewrites below are belt-and-braces.
  *
  * Vercel checks the filesystem before applying rewrites, so the prerendered
  * files would probably be picked up anyway — but "probably" is not good enough

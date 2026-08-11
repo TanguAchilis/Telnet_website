@@ -13,6 +13,6 @@
     { "source": "/shop", "destination": "/shop/index.html" },
     { "source": "/internship", "destination": "/internship/index.html" },
     { "source": "/contact", "destination": "/contact/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
