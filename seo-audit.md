@@ -1,6 +1,6 @@
 # SEO Audit — Telnet Cameroon
 
-**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `7c4c15c`
+**Date:** 2026-08-06 · **Branch:** `main` · **Audited at** `76df15b` · **Phase 2 implemented through** `e6377c8`
 
 > §1–§6 are the original audit, left as written. **§7 records what was implemented and measured; §8 is what you must do manually.**
 
@@ -219,6 +219,8 @@ Approved 2026-08-06. Thirteen commits on `main`, one concern each, no drive-by r
 | `2868374` | ESLint Node globals for the build scripts | — |
 | `8a29c65` | "Publish changes" button — rebuild on demand | §7.3 |
 | `7c4c15c` | Nightly cron rebuild backstop | §7.3 |
+| `f2047a7` | WhatsApp number configurable sitewide | §7.4 |
+| `e6377c8` | LocalBusiness contact details from the CMS | #14, §7.4 |
 
 ### Architecture
 
@@ -296,13 +298,50 @@ A 60-second cooldown stops a double-click queueing two builds, and it's recorded
 - Homepage requests zero admin chunks; `/admin/login` pulls its own JS and CSS on demand and renders styled.
 - JSON-LD: sitewide graph present in the static HTML; Product and BreadcrumbList populate from real data and are removed when navigating away.
 
+### 7.4 Contact details are CMS-driven
+
+Contact details lived in three places that had already drifted apart: the
+constants in `seo.js`, the `DEFAULT_CONTACT` fallback in `Contact.jsx`, and the
+`contact_info` record the admin panel actually edits. The live record said
+`+237672595150` / `info@telnetcameroon.org` / Mon–Fri 8–6; the code said
+`+237671827893` / `telnetinc23@gmail.com` / Tue–Fri 8–7. The wrong set was the
+one going into LocalBusiness markup and the `/contact` meta description.
+
+**WhatsApp number** (`f2047a7`). The admin field existed but drove exactly one
+link. `getWhatsAppUrl()` — used by the navbar CTA, floating bubble, hero,
+footer, services, shop, product enquiries and the 404 — used a hardcoded
+number. It now reads a module-level value populated from the CMS, so all
+~12 links follow the admin field. Edit it at **Admin → Content → Contact
+Details**.
+
+**Structured data** (`e6377c8`). `localBusinessSchema()` takes the CMS record,
+supplied at build time by the prerenderer and at runtime by `useSiteContact`.
+Opening hours are free text, so `parseOpeningHours` handles the shapes the field
+actually holds and omits the property entirely when a line doesn't parse —
+publishing wrong hours to Google is worse than publishing none.
+
+**The build-time seed.** `scripts/prerender.js` injects the record as
+`window.__TELNET_CONTACT__`, so the first render already has the right number.
+Without it the bundle boots with its fallback and only corrects itself once the
+runtime fetch resolves — which the snapshot could win the race against. The
+build before this fix produced a homepage with 7 WhatsApp links on one number
+and 4 on another. Verified after: 117 links across 23 pages, all one number, no
+page mixing two, identical with JavaScript disabled and enabled.
+
+The `/contact` description no longer names a phone number or opening days —
+descriptions are static strings, so anything written in goes stale the moment
+it changes.
+
+The MOMO payment-proof number in `InternshipPage.jsx` is a deliberately
+separate contact and is not affected.
+
 ### Known limitations — deliberately not papered over
 
 1. ~~**Prerendered content goes stale between deploys.**~~ ✅ **Addressed** — see §7.3. The snapshot is still point-in-time, but a **Publish changes** button in the admin topbar rebuilds on demand (~90 s), and a nightly cron caps staleness at 24 h if nobody clicks it. Visitors were never affected; only crawlers read the snapshot.
 2. **404s still return HTTP 200 (#6 is partial).** A static SPA cannot return a real 404 status without a server function, and unknown product IDs can't be enumerated at build time. `noindex` is the available mitigation and Google treats it as authoritative.
 3. **Vercel routing is unverified in production.** The generated files are correct and were verified through a server that resolves paths the way Vercel documents, but only a real deploy proves it. Static routes are named explicitly in `vercel.json`; **shop routes are not** — they're data-driven and can't be enumerated in config, so they depend on Vercel's filesystem check running before rewrites. This deployment already demonstrates that ordering (`/assets/*.js` is served despite the same catch-all). If it ever failed, those pages would fall through to the SPA shell — today's behaviour, not a regression. **Confirm after deploy** — see §8.
 4. **Chrome may not run on Vercel's build image.** It has no Chrome preinstalled and doesn't cache `~/.cache/puppeteer`, so `.puppeteerrc.cjs` pins the download inside `node_modules`. If Chrome still can't launch, the snapshot pass logs a warning and every route keeps its head-only version — the build succeeds either way. **Check the build log** for `snapshotted 24/24` to confirm it actually ran in CI.
-5. **JSON-LD opening hours are duplicated** from the `DEFAULT_CONTACT` fallback in `Contact.jsx`. That value is CMS-editable, so changing hours in the admin panel will not update the structured data. Noted in `structuredData.js`.
+5. ~~**JSON-LD opening hours are duplicated**~~ ✅ **Fixed** in `e6377c8` — see §7.4. Phone, email, address and hours now come from the CMS record at both build and runtime. This limitation had already bitten: the constants had drifted from the live data, so the site was publishing a wrong phone number, wrong email and wrong opening hours to Google.
 6. **Lighthouse numbers are localhost.** Real figures over Cameroonian mobile networks will be worse. Field data from Search Console is the real measure.
 
 ### Still open
