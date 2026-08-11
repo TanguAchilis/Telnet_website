@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { signOutAdmin } from '../../utils/admin'
+import { signOutAdmin, triggerRebuild } from '../../utils/admin'
 import { supabase } from '../../utils/supabase'
 import './AdminLayout.css'
 
@@ -93,6 +93,31 @@ export default function AdminLayout() {
         navigate('/admin/login')
     }
 
+    // Edits are live for visitors immediately. Publishing rebuilds the
+    // prerendered HTML that search engines and link previews read.
+    const [publishState, setPublishState] = useState({ status: 'idle', message: '' })
+
+    const handlePublish = async () => {
+        if (publishState.status === 'working') return
+        setPublishState({ status: 'working', message: '' })
+        try {
+            await triggerRebuild()
+            setPublishState({
+                status: 'done',
+                message: 'Rebuild started — search engines will see your changes in a couple of minutes.',
+            })
+        } catch (err) {
+            // A 404 means the Edge Function was never deployed — Supabase's own
+            // "Requested function was not found" is accurate but tells whoever
+            // is standing at the admin panel nothing about what to do.
+            const message =
+                err.status === 404
+                    ? 'Publishing is not set up yet. See supabase/functions/trigger-rebuild/README.md.'
+                    : err.message
+            setPublishState({ status: 'error', message })
+        }
+    }
+
     return (
         <div className="al-root">
             {/* Mobile overlay */}
@@ -157,14 +182,47 @@ export default function AdminLayout() {
                             <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
                         </svg>
                     </button>
-                    <a href="/" target="_blank" rel="noopener noreferrer" className="al-view-site">
-                        View site
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '0.3rem' }}>
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                    </a>
+                    <div className="al-topbar-actions">
+                        <button
+                            type="button"
+                            className="al-publish"
+                            onClick={handlePublish}
+                            disabled={publishState.status === 'working'}
+                            title="Rebuild the site so search engines and link previews pick up your changes"
+                        >
+                            {publishState.status === 'working' ? (
+                                <>
+                                    <span className="al-publish-spinner" aria-hidden="true" />
+                                    Publishing…
+                                </>
+                            ) : (
+                                <>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 14a8 8 0 0 1 8-8h5" /><polyline points="14 3 18 6 14 9" />
+                                        <path d="M20 10a8 8 0 0 1-8 8H7" /><polyline points="10 21 6 18 10 15" />
+                                    </svg>
+                                    Publish changes
+                                </>
+                            )}
+                        </button>
+                        <a href="/" target="_blank" rel="noopener noreferrer" className="al-view-site">
+                            View site
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '0.3rem' }}>
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                        </a>
+                    </div>
                 </header>
+                {publishState.message && (
+                    <div
+                        className={`al-publish-note${publishState.status === 'error' ? ' al-publish-note-error' : ''}`}
+                        role="status"
+                    >
+                        {publishState.message}
+                        <button type="button" onClick={() => setPublishState({ status: 'idle', message: '' })} aria-label="Dismiss">×</button>
+                    </div>
+                )}
                 <main className="al-main">
                     <Outlet />
                 </main>

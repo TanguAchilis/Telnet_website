@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchShopCategoryBySlug, fetchShopProductsByCategory, formatPrice } from '../utils/content'
 import { getWhatsAppUrl } from '../utils/whatsapp'
+import { shopCategoryMeta } from '../utils/seo'
+import { breadcrumbSchema } from '../utils/structuredData'
+import { useJsonLd, useSeo } from '../utils/useSeo'
 import './PageBanner.css'
 import './ShopFlow.css'
 
@@ -36,6 +39,16 @@ export default function ShopCategoryPage() {
 
     const title = category?.name || slugToTitle(categorySlug)
     const waMessage = `Hello Telnet Cameroon! I'm interested in your ${title} — could you share what's currently available and the prices?`
+
+    useSeo(shopCategoryMeta(title, category?.description, `/shop/${categorySlug}`))
+    useJsonLd(
+        'breadcrumb',
+        breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Shop', path: '/shop' },
+            { name: title, path: `/shop/${categorySlug}` },
+        ])
+    )
 
     return (
         <>

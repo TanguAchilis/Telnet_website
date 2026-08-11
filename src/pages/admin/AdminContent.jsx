@@ -4,6 +4,7 @@ import {
     fetchSiteStats, fetchContactInfo, fetchServices, fetchTeamMembers,
     createRow, updateRow, deleteRow,
 } from '../../utils/content'
+import { normalizeWhatsAppNumber } from '../../utils/whatsapp'
 import Modal from '../../components/admin/Modal'
 import ImageUpload from '../../components/admin/ImageUpload'
 import './admin.css'
@@ -74,8 +75,16 @@ export default function AdminContent() {
     const saveContact = async () => {
         setContactSaving(true); setContactOk(false); setError('')
         try {
-            const { error: err } = await saveSetting('contact_info', contact)
+            // Store digits only. wa.me rejects '+' and spaces, and the number is
+            // read straight back out to build every chat link on the site.
+            const whatsapp = normalizeWhatsAppNumber(contact.whatsapp)
+            if (contact.whatsapp?.trim() && !whatsapp) {
+                throw new Error('WhatsApp number must contain digits, e.g. +237 679 837 395.')
+            }
+            const payload = { ...contact, whatsapp: whatsapp ?? '' }
+            const { error: err } = await saveSetting('contact_info', payload)
             if (err) throw err
+            setContact(payload)
             setContactOk(true); setTimeout(() => setContactOk(false), 3000)
         } catch (e) { setError(e.message) } finally { setContactSaving(false) }
     }
@@ -179,8 +188,24 @@ export default function AdminContent() {
                             <input className="ap-input" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
                         </div>
                         <div className="ap-form-group">
-                            <label className="ap-label">WhatsApp number (digits, e.g. 237671827893)</label>
-                            <input className="ap-input" value={contact.whatsapp} onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })} />
+                            <label className="ap-label">WhatsApp number — customer contact</label>
+                            <input
+                                className="ap-input"
+                                value={contact.whatsapp}
+                                onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })}
+                                placeholder="+237 6XX XXX XXX"
+                                inputMode="tel"
+                            />
+                            <p className="acms-hint">
+                                Every &ldquo;Chat on WhatsApp&rdquo; button on the site points here — the navbar
+                                quote button, the floating bubble, hero, footer, services, shop and product
+                                enquiries. Include the country code; spaces and
+                                {' '}
+                                <code>+</code> are fine.
+                                {normalizeWhatsAppNumber(contact.whatsapp)
+                                    ? ` Chats will open at wa.me/${normalizeWhatsAppNumber(contact.whatsapp)}.`
+                                    : ' Enter a number to enable the WhatsApp buttons.'}
+                            </p>
                         </div>
                         <div className="ap-form-group">
                             <label className="ap-label">Address</label>

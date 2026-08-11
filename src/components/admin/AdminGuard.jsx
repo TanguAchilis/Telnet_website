@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { supabase, hasSupabaseConfig } from '../../utils/supabase'
+import { useSeo } from '../../utils/useSeo'
 
 export default function AdminGuard() {
     const [status, setStatus] = useState('loading')
+
+    // Admin pages sit outside PublicLayout, so nothing else sets their head.
+    useSeo({
+        title: 'Admin — Telnet Cameroon',
+        description: 'Administration area.',
+        noindex: true,
+    })
 
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase) {
