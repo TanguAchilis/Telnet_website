@@ -5,7 +5,6 @@
   "crons": [
     { "path": "/api/rebuild", "schedule": "0 3 * * *" }
   ],
-  "_comment_rewrites": "The catch-all must stay a plain /(.*). A /((?!api/).*) negative lookahead was tried and silently matched nothing on Vercel, hard-404ing every route that isn't prerendered. It is not needed either: Vercel resolves the filesystem — static files and api/ functions alike — before applying rewrites, so /api/rebuild is reached regardless.",
   "rewrites": [
     { "source": "/services", "destination": "/services/index.html" },
     { "source": "/about", "destination": "/about/index.html" },

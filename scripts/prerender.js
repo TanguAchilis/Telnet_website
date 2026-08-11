@@ -330,6 +330,19 @@ async function injectBody(route, body) {
 }
 
 /**
+ * Two things about vercel.json worth knowing before editing it, since the file
+ * is strict JSON and can't hold comments of its own:
+ *
+ *   1. The catch-all must stay a plain `/(.*)`. A `/((?!api/).*)` negative
+ *      lookahead was tried and silently matched nothing once deployed, so every
+ *      route that isn't prerendered hard-404ed instead of falling back to the
+ *      SPA. Vercel compiles `source` with path-to-regexp, not JS RegExp. The
+ *      exclusion isn't needed anyway: the filesystem — static files and api/
+ *      functions alike — is resolved before rewrites, so /api/rebuild is
+ *      reached regardless.
+ *   2. Unknown top-level keys fail schema validation and break the build. There
+ *      is nowhere in that file to leave a note; leave it here.
+ *
  * Vercel checks the filesystem before applying rewrites, so the prerendered
  * files would probably be picked up anyway — but "probably" is not good enough
  * for the thing the whole SEO pass rests on. vercel.json therefore names each
