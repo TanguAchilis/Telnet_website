@@ -31,7 +31,7 @@ import {
     shopProductMeta,
 } from '../src/utils/seo.js'
 import { breadcrumbSchema, jsonLdScript, productSchema, siteGraph } from '../src/utils/structuredData.js'
-import { fetchShopRoutes, loadSupabaseEnv } from './lib/shopRoutes.js'
+import { fetchContactInfo, fetchShopRoutes, loadSupabaseEnv } from './lib/siteData.js'
 import { startStaticServer } from './lib/staticServer.js'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -84,6 +84,7 @@ async function main() {
     // Same graph on every page; useJsonLd('site', ...) adopts this node at
     // runtime by id rather than appending a second copy.
     const siteJsonLd = jsonLdScript(siteGraph(), 'jsonld-site')
+    const contactScript = await buildContactScript()
 
     for (const route of routes) {
         const meta = resolveMeta(route)
@@ -96,6 +97,7 @@ async function main() {
         }
 
         parts.push(siteJsonLd)
+        if (contactScript) parts.push(contactScript)
         await writeShell(shell, route, parts.join('\n'), meta.title)
         written.push(route)
     }
@@ -108,9 +110,37 @@ async function main() {
     // deployment already demonstrates, since /assets/*.js is served despite the
     // same catch-all. If it ever didn't, these would fall through to the SPA
     // shell: today's behaviour, not a regression.
-    const shopRoutes = await writeShopShells(shell, siteJsonLd)
+    const shopRoutes = await writeShopShells(shell, siteJsonLd, contactScript)
 
     await snapshotBodies([...written, ...shopRoutes])
+}
+
+/**
+ * A <script> seeding window.__TELNET_CONTACT__ with the admin-editable contact
+ * record, so the app's very first render already has the right WhatsApp number.
+ *
+ * Without it the bundle boots with its compiled-in fallback and only corrects
+ * itself once the runtime fetch resolves. Visitors on a slow connection would
+ * briefly see the wrong number, and the snapshot could win the race against the
+ * re-render — which produced prerendered pages carrying two different numbers.
+ *
+ * Returns null if Supabase is unreachable; the app then uses its fallback,
+ * which is the behaviour that existed before this.
+ */
+async function buildContactScript() {
+    const env = await loadSupabaseEnv()
+    if (!env.url || !env.key) return null
+
+    try {
+        const contact = await fetchContactInfo(env)
+        if (!contact) return null
+        // Escape '<' so a stray "</script>" in a CMS field can't break out.
+        const json = JSON.stringify(contact).replace(/</g, '\\u003c')
+        return `    <script>window.__TELNET_CONTACT__=${json}</script>`
+    } catch (error) {
+        console.warn(`[prerender] contact_info unavailable (${error.message}) — using compiled-in fallback.`)
+        return null
+    }
 }
 
 /** '/' overwrites the shell itself; other routes get a directory index. */
@@ -131,7 +161,7 @@ async function writeShell(shell, route, head, title) {
  *
  * Returns the paths written, or [] if Supabase couldn't be reached.
  */
-async function writeShopShells(shell, siteJsonLd) {
+async function writeShopShells(shell, siteJsonLd, contactScript) {
     const env = await loadSupabaseEnv()
     if (!env.url || !env.key) {
         console.warn('[prerender] no Supabase credentials — shop routes not prerendered.')
@@ -159,7 +189,8 @@ async function writeShopShells(shell, siteJsonLd) {
             metaTagsToHtml(meta),
             siteJsonLd,
             jsonLdScript(crumbs, 'jsonld-breadcrumb'),
-        ].join('\n')
+            contactScript,
+        ].filter(Boolean).join('\n')
         await writeShell(shell, category.path, head, meta.title)
         paths.push(category.path)
     }
@@ -177,7 +208,8 @@ async function writeShopShells(shell, siteJsonLd) {
             siteJsonLd,
             jsonLdScript(productSchema(entry.product, entry.categoryName, entry.path), 'jsonld-product'),
             jsonLdScript(crumbs, 'jsonld-breadcrumb'),
-        ].join('\n')
+            contactScript,
+        ].filter(Boolean).join('\n')
         await writeShell(shell, entry.path, head, meta.title)
         paths.push(entry.path)
     }

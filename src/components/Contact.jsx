@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { whatsappMessages } from '../utils/whatsapp'
+import { DEFAULT_WHATSAPP_NUMBER, getWhatsAppUrl, whatsappMessages } from '../utils/whatsapp'
 import { fetchContactInfo } from '../utils/content'
 import './Contact.css'
 
@@ -7,7 +7,7 @@ const DEFAULT_CONTACT = {
     phone: '+237 671 827 893 / 674 410 358',
     email: 'telnetinc23@gmail.com',
     address: 'Tarred Malingo, behind Amazing Pharmacy, Molyko-Buea / St Claire',
-    whatsapp: '237671827893',
+    whatsapp: DEFAULT_WHATSAPP_NUMBER,
     hours: 'Tue – Fri: 8am – 7pm\nSaturday: 9am – 6pm',
 }
 
@@ -24,8 +24,9 @@ export default function Contact({ showHeader = true }) {
         return () => { active = false }
     }, [])
 
-    const waDigits = (contact.whatsapp || '').replace(/\D/g, '')
-    const waHref = `https://wa.me/${waDigits}?text=${encodeURIComponent(whatsappMessages.general)}`
+    // Built by the shared helper rather than assembled here, so this link can't
+    // drift from the dozen other WhatsApp buttons on the site.
+    const waHref = getWhatsAppUrl(whatsappMessages.general)
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })

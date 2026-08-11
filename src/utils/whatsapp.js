@@ -1,5 +1,42 @@
-// WhatsApp utility for Telnet Cameroon
-const WHATSAPP_NUMBER = '237671827893'
+// WhatsApp utility for Telnet Cameroon.
+//
+// The number is editable in Admin → Content → Contact Details, stored under the
+// `contact_info` setting. useWhatsAppNumberSync() (called once in PublicLayout)
+// loads it and calls setWhatsAppNumber below, so every getWhatsAppUrl() caller
+// picks it up without threading it through props — there are a dozen of them,
+// across the navbar, hero, footer, floating button, services, shop, product
+// pages and the 404.
+
+/** Used before the stored value loads, and if it's unset or unreachable. */
+export const DEFAULT_WHATSAPP_NUMBER = '237679837395'
+
+/** wa.me wants digits only — strips '+', spaces and punctuation. */
+export function normalizeWhatsAppNumber(value) {
+    const digits = String(value ?? '').replace(/\D/g, '')
+    return digits || null
+}
+
+// scripts/prerender.js seeds window.__TELNET_CONTACT__ with the stored contact
+// record, so the first render already has the right number instead of showing
+// the fallback until the runtime fetch resolves.
+let currentNumber =
+    (typeof window !== 'undefined' && normalizeWhatsAppNumber(window.__TELNET_CONTACT__?.whatsapp)) ||
+    DEFAULT_WHATSAPP_NUMBER
+
+export function getWhatsAppNumber() {
+    return currentNumber
+}
+
+/**
+ * Points every WhatsApp link at a new number.
+ * Returns true if the value actually changed, so callers can skip a re-render.
+ */
+export function setWhatsAppNumber(value) {
+    const digits = normalizeWhatsAppNumber(value)
+    if (!digits || digits === currentNumber) return false
+    currentNumber = digits
+    return true
+}
 
 /**
  * Generates a WhatsApp click-to-chat URL with a pre-drafted message.
@@ -8,7 +45,7 @@ const WHATSAPP_NUMBER = '237671827893'
  */
 export function getWhatsAppUrl(message) {
     const encodedMessage = encodeURIComponent(message)
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`
+    return `https://wa.me/${currentNumber}?text=${encodedMessage}`
 }
 
 /**

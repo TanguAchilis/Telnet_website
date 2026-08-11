@@ -1,7 +1,7 @@
 // Generates dist/sitemap.xml at build time.
 //
 // The eight static routes come from the route map; shop URLs come from
-// Supabase via scripts/lib/shopRoutes.js (shared with the prerenderer).
+// Supabase via scripts/lib/siteData.js (shared with the prerenderer).
 //
 // If Supabase is unreachable or unconfigured, the sitemap still gets written
 // with the static routes and the build succeeds. A missing product URL is a
@@ -12,7 +12,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { ROUTE_META, SITE_URL, canonicalFor } from '../src/utils/seo.js'
-import { fetchShopRoutes, loadSupabaseEnv } from './lib/shopRoutes.js'
+import { fetchShopRoutes, loadSupabaseEnv } from './lib/siteData.js'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = join(ROOT, 'dist')

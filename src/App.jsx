@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import { useJsonLd, useStaticRouteSeo } from './utils/useSeo'
+import { useWhatsAppNumberSync } from './utils/useWhatsAppNumber'
 import { siteGraph } from './utils/structuredData'
 import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
@@ -77,6 +78,8 @@ function PublicLayout() {
   useStaticRouteSeo()
   // Prerendered into the static HTML too, so non-JS crawlers see it as well.
   useJsonLd('site', siteGraph())
+  // Points every WhatsApp link at the number set in Admin → Content.
+  useWhatsAppNumberSync()
 
   return (
     <>

@@ -1,9 +1,10 @@
-// Shared build-time access to the shop's public URLs.
+// Shared build-time reads of CMS data.
 //
-// Both the sitemap and the prerenderer need the same list of category and
-// product routes, pulled from Supabase over the public REST endpoint using the
-// same publishable key the browser already uses. Those rows are anon-readable
-// under the existing RLS policy, so the build gains no extra privilege.
+// The sitemap and the prerenderer both need the shop's public URLs, and the
+// prerenderer also needs the contact record. All of it comes from Supabase over
+// the public REST endpoint using the same publishable key the browser already
+// uses — those rows are anon-readable under the existing RLS policy, so the
+// build gains no extra privilege.
 
 import { readFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
@@ -44,6 +45,22 @@ async function query(env, path) {
     })
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
     return response.json()
+}
+
+/**
+ * The admin-editable contact record (phone, email, address, hours, whatsapp).
+ *
+ * Baked into the prerendered HTML so the first render already has the right
+ * WhatsApp number. Without it the app boots with the hardcoded fallback and
+ * only corrects itself once the runtime fetch resolves — which the snapshot
+ * can win the race against, producing pages with two different numbers on them.
+ *
+ * Returns null if the row is absent or unreadable; callers fall back to the
+ * defaults compiled into the bundle.
+ */
+export async function fetchContactInfo(env) {
+    const rows = await query(env, 'admin_settings?select=value&key=eq.contact_info')
+    return rows?.[0]?.value ?? null
 }
 
 /**
