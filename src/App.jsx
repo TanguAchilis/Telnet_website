@@ -4,7 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import { useJsonLd, useStaticRouteSeo } from './utils/useSeo'
-import { useWhatsAppNumberSync } from './utils/useWhatsAppNumber'
+import { useSiteContact } from './utils/useSiteContact'
 import { siteGraph } from './utils/structuredData'
 import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
@@ -76,10 +76,11 @@ function PublicLayout() {
   // Covers the eight static public routes. Shop category/product and the 404
   // page set their own metadata — see useStaticRouteSeo.
   useStaticRouteSeo()
+  // Drives every WhatsApp link and the LocalBusiness phone/email/hours, so both
+  // follow Admin → Content → Contact Details rather than hardcoded constants.
+  const contact = useSiteContact()
   // Prerendered into the static HTML too, so non-JS crawlers see it as well.
-  useJsonLd('site', siteGraph())
-  // Points every WhatsApp link at the number set in Admin → Content.
-  useWhatsAppNumberSync()
+  useJsonLd('site', siteGraph(contact))
 
   return (
     <>

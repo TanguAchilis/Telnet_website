@@ -83,8 +83,9 @@ async function main() {
 
     // Same graph on every page; useJsonLd('site', ...) adopts this node at
     // runtime by id rather than appending a second copy.
-    const siteJsonLd = jsonLdScript(siteGraph(), 'jsonld-site')
-    const contactScript = await buildContactScript()
+    const contact = await loadContactInfo()
+    const contactScript = buildContactScript(contact)
+    const siteJsonLd = jsonLdScript(siteGraph(contact), 'jsonld-site')
 
     for (const route of routes) {
         const meta = resolveMeta(route)
@@ -116,31 +117,34 @@ async function main() {
 }
 
 /**
- * A <script> seeding window.__TELNET_CONTACT__ with the admin-editable contact
- * record, so the app's very first render already has the right WhatsApp number.
+ * The admin-editable contact record, or null if Supabase is unreachable — in
+ * which case everything downstream falls back to the constants in seo.js.
+ */
+async function loadContactInfo() {
+    const env = await loadSupabaseEnv()
+    if (!env.url || !env.key) return null
+    try {
+        return await fetchContactInfo(env)
+    } catch (error) {
+        console.warn(`[prerender] contact_info unavailable (${error.message}) — using compiled-in fallback.`)
+        return null
+    }
+}
+
+/**
+ * A <script> seeding window.__TELNET_CONTACT__, so the app's very first render
+ * already has the right WhatsApp number.
  *
  * Without it the bundle boots with its compiled-in fallback and only corrects
  * itself once the runtime fetch resolves. Visitors on a slow connection would
  * briefly see the wrong number, and the snapshot could win the race against the
  * re-render — which produced prerendered pages carrying two different numbers.
- *
- * Returns null if Supabase is unreachable; the app then uses its fallback,
- * which is the behaviour that existed before this.
  */
-async function buildContactScript() {
-    const env = await loadSupabaseEnv()
-    if (!env.url || !env.key) return null
-
-    try {
-        const contact = await fetchContactInfo(env)
-        if (!contact) return null
-        // Escape '<' so a stray "</script>" in a CMS field can't break out.
-        const json = JSON.stringify(contact).replace(/</g, '\\u003c')
-        return `    <script>window.__TELNET_CONTACT__=${json}</script>`
-    } catch (error) {
-        console.warn(`[prerender] contact_info unavailable (${error.message}) — using compiled-in fallback.`)
-        return null
-    }
+function buildContactScript(contact) {
+    if (!contact) return null
+    // Escape '<' so a stray "</script>" in a CMS field can't break out.
+    const json = JSON.stringify(contact).replace(/</g, '\\u003c')
+    return `    <script>window.__TELNET_CONTACT__=${json}</script>`
 }
 
 /** '/' overwrites the shell itself; other routes get a directory index. */

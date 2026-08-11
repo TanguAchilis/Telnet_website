@@ -81,8 +81,12 @@ export const ROUTE_META = {
     },
     '/contact': {
         title: 'Contact Telnet Cameroon — Molyko, Buea',
+        // No phone number or opening days here on purpose: contact details are
+        // CMS-editable and a description is a static string, so anything written
+        // in would go stale the moment it changed. Both live in the page and in
+        // the LocalBusiness markup, which follow the CMS.
         description:
-            'Reach Telnet Cameroon in Molyko-Buea for tech support, quotes or enquiries. Call +237 671 827 893, email us, or chat with us on WhatsApp.',
+            'Reach Telnet Cameroon in Molyko-Buea for tech support, quotes or enquiries about laptops, CCTV, networking and training — call, email or WhatsApp us.',
     },
 }
 
