@@ -17,7 +17,7 @@
 insert into public.admin_settings (key, value, updated_at)
 values (
     'contact_info',
-    jsonb_build_object('whatsapp', '237679837395'),
+    jsonb_build_object('whatsapp', '237672595150'),
     now()
 )
 on conflict (key) do update
@@ -26,7 +26,7 @@ on conflict (key) do update
 set value = jsonb_set(
         coalesce(admin_settings.value, '{}'::jsonb),
         '{whatsapp}',
-        '"237679837395"'::jsonb,
+        '"237672595150"'::jsonb,
         true
     ),
     updated_at = now();

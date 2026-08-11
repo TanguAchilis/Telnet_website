@@ -335,7 +335,41 @@ it changes.
 The MOMO payment-proof number in `InternshipPage.jsx` is a deliberately
 separate contact and is not affected.
 
+### 7.5 Verified on Vercel — preview deploy
+
+Everything below was checked against a real Vercel preview of this branch, not just a local build. This is what local testing could not confirm.
+
+| Check | Result |
+|---|---|
+| Per-route titles, all 8 routes | ✅ each unique |
+| Prerendered shop category / product | ✅ "Networking Tools — Shop", "HP EliteBook 840 G5" |
+| SPA fallback for unknown routes | ✅ 200 |
+| `robots.txt` / `sitemap.xml` / `og-image.jpg` | ✅ `text/plain` / `application/xml` / `image/jpeg` |
+| Canonicals | ✅ all on the production `www` origin, not the preview host |
+| LocalBusiness JSON-LD | ✅ `+237 679 837 395`, `info@telnetcameroon.org`, Mon–Fri 08:00–18:00, Sat 09:00–16:00 — all from the CMS |
+| `/api/rebuild` | ✅ reached, returns its own 503 while `CRON_SECRET` is unset |
+| **Body prerendering** | ❌ **does not run on Vercel** — see below |
+
+**Two `vercel.json` mistakes worth not repeating**, both of which shipped broken previews before being caught:
+
+1. A `/((?!api/).*)` catch-all **silently matches nothing** on Vercel. `source` is compiled with path-to-regexp, not JS `RegExp` — testing the pattern with `new RegExp(...)` passes while the deployed behaviour is broken. The exclusion is also unnecessary: the filesystem, static files and `api/` functions alike, resolves before rewrites.
+2. Under `cleanUrls: true`, `/index.html` **308-redirects to `/`**, so a catch-all with `destination: "/index.html"` resolves to nothing and every unmatched route hard-404s. The destination must be `/`.
+
+Both failures looked identical from outside — unmatched routes 404ing — but had different causes, and the first fix didn't resolve the second.
+
+Also note `vercel.json` is schema-validated with `additionalProperties: false`. An unknown top-level key fails the build outright, and the file cannot hold comments. Notes about it live in `scripts/prerender.js`.
+
+**`dist/_seo-prerender.json`** records the snapshot outcome, because the body pass degrades silently by design and Vercel build logs aren't always reachable. `curl <url>/_seo-prerender.json` answers "did prerendering work?" from outside — counts and an error string only.
+
+---
+
 ### Known limitations — deliberately not papered over
+
+0. **Body prerendering does not run on Vercel.** Chromium installs, but the build image lacks Chrome's shared libraries:
+   `error while loading shared libraries: libnspr4.so`.
+   The fallback works exactly as designed — every route keeps correct metadata, OG tags, canonicals and JSON-LD; only the rendered body text is missing, so non-JS crawlers still see an empty `<div id="root">`. It **does** work locally (23/23 routes), so the capability is real and only the host is short.
+   **Impact is narrower than it sounds:** Google executes JavaScript and indexes the content anyway; social scrapers only read OG tags, which work. The gap is Bing and other non-rendering crawlers.
+   **The fix, when it's worth it:** `@sparticuz/chromium` — Chromium bundled with its libraries for Amazon Linux — paired with `puppeteer-core`. Deferred as a deliberate decision: ~50 MB, a version pin, and a Vercel-vs-local branch in the prerender script, for a modest slice of crawler traffic. `_seo-prerender.json` will keep reporting `ok:false` so this stays visible rather than quietly forgotten.
 
 1. ~~**Prerendered content goes stale between deploys.**~~ ✅ **Addressed** — see §7.3. The snapshot is still point-in-time, but a **Publish changes** button in the admin topbar rebuilds on demand (~90 s), and a nightly cron caps staleness at 24 h if nobody clicks it. Visitors were never affected; only crawlers read the snapshot.
 2. **404s still return HTTP 200 (#6 is partial).** A static SPA cannot return a real 404 status without a server function, and unknown product IDs can't be enumerated at build time. `noindex` is the available mitigation and Google treats it as authoritative.
