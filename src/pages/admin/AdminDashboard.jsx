@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { fetchApplicationStats } from '../../utils/admin'
 import './admin.css'
 import './AdminDashboard.css'
+import { Icon } from '../../icons'
 
 function statusCounts(apps) {
     return apps.reduce((acc, a) => {
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
                 </div>
                 {recent.length === 0 ? (
                     <div className="ap-empty">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                        <Icon name="file-text" size={32} />
                         <strong>No applications yet</strong>
                     </div>
                 ) : (
@@ -177,10 +178,10 @@ export default function AdminDashboard() {
                                         className={app.id ? 'ap-table-link' : ''}
                                         onClick={app.id ? () => navigate(`/admin/applications/${app.id}`) : undefined}
                                     >
-                                        <td className="ap-table-name">{app.full_name || '—'}</td>
-                                        <td className="ap-table-muted">{app.program_option || '—'}</td>
+                                        <td className="ap-table-name">{app.full_name || '-'}</td>
+                                        <td className="ap-table-muted">{app.program_option || '-'}</td>
                                         <td><span className={`ap-badge ap-badge-${app.status}`}>{STATUS_LABEL[app.status] || app.status}</span></td>
-                                        <td className="ap-table-muted">{app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '—'}</td>
+                                        <td className="ap-table-muted">{app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '-'}</td>
                                     </tr>
                                 ))}
                             </tbody>

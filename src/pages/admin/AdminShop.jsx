@@ -12,6 +12,7 @@ import ImageUpload from '../../components/admin/ImageUpload'
 import MultiImageInput from '../../components/admin/MultiImageInput'
 import './admin.css'
 import './AdminCms.css'
+import { Icon } from '../../icons'
 
 function slugify(text) {
     return (text || '')
@@ -134,7 +135,7 @@ export default function AdminShop() {
         await load()
     }
 
-    const catName = (id) => categories.find((c) => c.id === id)?.name || '—'
+    const catName = (id) => categories.find((c) => c.id === id)?.name || '-'
     const shownProducts = filter ? products.filter((p) => p.category_id === filter) : products
 
     if (loading) {
@@ -165,7 +166,7 @@ export default function AdminShop() {
                         {categories.map((cat) => (
                             <div key={cat.id} className="acms-tile">
                                 <div className="acms-tile-media">
-                                    {cat.image_url ? <img src={cat.image_url} alt="" /> : <span>🛍️</span>}
+                                    {cat.image_url ? <img src={cat.image_url} alt="" /> : <span><Icon name="bag" size={22} /></span>}
                                     {!cat.is_active && <span className="acms-tile-flag">Hidden</span>}
                                 </div>
                                 <div className="acms-tile-body">
@@ -224,7 +225,7 @@ export default function AdminShop() {
                                         <td>
                                             <div className="acms-row-item">
                                                 <div className="acms-row-thumb">
-                                                    {p.image_url ? <img src={p.image_url} alt="" /> : <span>🖼️</span>}
+                                                    {p.image_url ? <img src={p.image_url} alt="" /> : <span><Icon name="image" size={20} /></span>}
                                                 </div>
                                                 <div>
                                                     <span className="ap-table-name">{p.name}</span>

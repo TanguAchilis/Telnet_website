@@ -82,6 +82,12 @@
     color: #ffffff;
 }
 
+.footer-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
 .footer-links-group li svg {
     color: rgba(255, 255, 255, 0.9);
     min-width: 14px;

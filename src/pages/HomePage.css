@@ -30,7 +30,8 @@
 }
 
 .what-we-do-icon {
-    font-size: 1.2rem;
+    color: var(--color-accent);
+    flex-shrink: 0;
 }
 
 .what-we-do-label {

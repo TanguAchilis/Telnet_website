@@ -1,3 +1,4 @@
+import { Icon } from '../icons'
 import './About.css'
 
 export default function About({ showHeader = true }) {
@@ -16,9 +17,7 @@ export default function About({ showHeader = true }) {
                     <div className="about-card glass-card animate-on-scroll">
                         <div className="about-card-accent mission-accent"></div>
                         <div className="about-card-icon">
-                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
-                            </svg>
+                            <Icon name="target" size={34} />
                         </div>
                         <h3 className="about-card-title">Our Mission</h3>
                         <p className="about-card-text">
@@ -31,9 +30,7 @@ export default function About({ showHeader = true }) {
                     <div className="about-card glass-card animate-on-scroll">
                         <div className="about-card-accent vision-accent"></div>
                         <div className="about-card-icon">
-                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-                            </svg>
+                            <Icon name="eye" size={34} />
                         </div>
                         <h3 className="about-card-title">Our Vision</h3>
                         <p className="about-card-text">
@@ -48,13 +45,13 @@ export default function About({ showHeader = true }) {
                     <h3 className="values-title">Our Core Values</h3>
                     <div className="values-grid">
                         {[
-                            { icon: '🎯', label: 'Professionalism' },
-                            { icon: '💡', label: 'Innovation' },
-                            { icon: '🤝', label: 'Customer Satisfaction' },
-                            { icon: '📚', label: 'Continuous Learning' },
+                            { icon: 'award', label: 'Professionalism' },
+                            { icon: 'lightbulb', label: 'Innovation' },
+                            { icon: 'heart', label: 'Customer Satisfaction' },
+                            { icon: 'book', label: 'Continuous Learning' },
                         ].map((value, i) => (
                             <div key={i} className="value-item">
-                                <span className="value-icon">{value.icon}</span>
+                                <span className="value-icon"><Icon name={value.icon} size={30} /></span>
                                 <span className="value-label">{value.label}</span>
                             </div>
                         ))}

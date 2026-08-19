@@ -1,11 +1,11 @@
 /* ============================================
-   TELNET CAMEROON — Global Design System
+   TELNET CAMEROON: Global Design System
    Refined Orange & Warm White Edition
    ============================================ */
 
 /* --- CSS Custom Properties --- */
 :root {
-  /* Colors — Refined Brand Palette */
+  /* Colors: Refined Brand Palette */
   --color-primary: #fcfaf7;
   --color-primary-light: #f6f1eb;
   --color-primary-lighter: #efe7de;
@@ -83,6 +83,15 @@
   /* Layout */
   --max-width: 1200px;
   --nav-height: 76px;
+}
+
+/* --- Icon pack ---
+   Every icon on the site is an <Icon> from src/icons/. These are the only
+   rules that apply to all of them; anything else belongs on the container. */
+.tn-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 /* --- Reset & Base --- */
@@ -311,7 +320,7 @@ ol {
   transform: translateY(-2px);
 }
 
-/* --- Glass Card — Warm Luxury Edition --- */
+/* --- Glass Card: Warm Luxury Edition --- */
 .glass-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);

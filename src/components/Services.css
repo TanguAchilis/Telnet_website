@@ -74,11 +74,6 @@
     height: 80px;
 }
 
-.bento-item-1 .service-icon svg {
-    width: 40px;
-    height: 40px;
-}
-
 .service-card::before {
     content: '';
     position: absolute;
@@ -114,13 +109,9 @@
     transform: scale(1.08);
 }
 
-.service-icon-emoji {
-    font-size: 1.9rem;
-    line-height: 1;
-}
-
-.bento-item-1 .service-icon-emoji {
-    font-size: 2.4rem;
+.service-feature-tick {
+    color: var(--color-accent);
+    flex-shrink: 0;
 }
 
 .service-title {
