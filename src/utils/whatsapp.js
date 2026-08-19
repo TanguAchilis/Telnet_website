@@ -3,7 +3,7 @@
 // The number is editable in Admin → Content → Contact Details, stored under the
 // `contact_info` setting. useWhatsAppNumberSync() (called once in PublicLayout)
 // loads it and calls setWhatsAppNumber below, so every getWhatsAppUrl() caller
-// picks it up without threading it through props — there are a dozen of them,
+// picks it up without threading it through props; there are a dozen of them,
 // across the navbar, hero, footer, floating button, services, shop, product
 // pages and the 404.
 
@@ -12,7 +12,7 @@ import { CONTACT_FALLBACK, getSiteContact } from './siteContact.js'
 /** Used before the stored value loads, and if it's unset or unreachable. */
 export const DEFAULT_WHATSAPP_NUMBER = CONTACT_FALLBACK.whatsapp
 
-/** wa.me wants digits only — strips '+', spaces and punctuation. */
+/** wa.me wants digits only; strips '+', spaces and punctuation. */
 export function normalizeWhatsAppNumber(value) {
     const digits = String(value ?? '').replace(/\D/g, '')
     return digits || null

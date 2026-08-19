@@ -231,7 +231,7 @@ where not exists (select 1 from public.team_members);
 -- Storage bucket for uploaded images (public read, admin write).
 -- Run last: if your project restricts policy creation on storage.objects
 -- (error 42501 "must be owner of table objects"), everything above still
--- applies — just create the bucket + policies from the Storage dashboard.
+-- applies; just create the bucket + policies from the Storage dashboard.
 -- ---------------------------------------------------------------------
 
 insert into storage.buckets (id, name, public)

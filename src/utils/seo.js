@@ -1,8 +1,8 @@
 // Single source of truth for per-route metadata.
 //
 // This module is imported by two very different consumers:
-//   1. the React app, via useSeo() — applies tags on client-side navigation
-//   2. scripts/prerender.js and scripts/sitemap.js — plain Node, at build time
+//   1. the React app, via useSeo(), which applies tags on client-side navigation
+//   2. scripts/prerender.js and scripts/sitemap.js, plain Node, at build time
 //
 // So it must stay free of React, JSX, and import.meta.env.
 
@@ -13,7 +13,7 @@ export const SITE_URL = 'https://www.telnetcameroon.org'
 export const SITE_NAME = 'Telnet Cameroon'
 export const LOCALE = 'en_US'
 
-// 1080x607 — above the 600x315 minimum for large social cards.
+// 1080x607, above the 600x315 minimum for large social cards.
 export const DEFAULT_OG_IMAGE = {
     path: '/og-image.jpg',
     width: 1080,
@@ -22,7 +22,7 @@ export const DEFAULT_OG_IMAGE = {
 }
 
 // Structural details that aren't editable in the CMS. Anything the admin panel
-// *can* change — phone, email, address, hours, WhatsApp — comes from
+// *can* change (phone, email, address, hours, WhatsApp) comes from
 // CONTACT_FALLBACK so there's one copy to keep honest, and the stored record
 // overrides it at build and runtime anyway.
 export const BUSINESS = {
@@ -45,18 +45,18 @@ export const BUSINESS = {
 // Descriptions are drawn from each page's own on-page copy so they stay truthful.
 export const ROUTE_META = {
     '/': {
-        title: 'Telnet Cameroon — IT Solutions & Laptops in Buea',
+        title: 'Telnet Cameroon | IT Solutions & Laptops in Buea',
         description:
-            'Telnet Cameroon provides quality, reliable digital solutions in Buea — laptop sales, CCTV installation, internet setup, tech training and IT consultancy.',
+            'Telnet Cameroon provides quality, reliable digital solutions in Buea: laptop sales, CCTV installation, internet setup, tech training and IT consultancy.',
         // The hero background is a CSS background-image, so the browser can't
         // discover it until React has mounted. Preloading lets it download
         // alongside the JS bundle instead of after it.
         preloadImage: HERO_FIRST_IMAGE,
     },
     '/services': {
-        title: 'Our Services — Telnet Cameroon',
+        title: 'Our Services | Telnet Cameroon',
         description:
-            'Technology solutions tailored to your needs — laptop sales, CCTV installation, networking, internet setup, tech training and cybersecurity in Buea.',
+            'Technology solutions tailored to your needs: laptop sales, CCTV installation, networking, internet setup, tech training and cybersecurity in Buea.',
     },
     '/about': {
         title: 'About Telnet Cameroon',
@@ -64,40 +64,40 @@ export const ROUTE_META = {
             'Bridging the digital divide and empowering communities through technology. Learn about Telnet Cameroon’s mission, values and work in Buea.',
     },
     '/team': {
-        title: 'Meet Our Team — Telnet Cameroon',
+        title: 'Meet Our Team | Telnet Cameroon',
         description:
             'Meet the skilled technology professionals and trainers behind Telnet Cameroon, dedicated to delivering excellence for clients across Cameroon.',
     },
     '/gallery': {
-        title: 'Gallery — Telnet Cameroon',
+        title: 'Gallery | Telnet Cameroon',
         description:
             'A glimpse into our training sessions, field installations and community impact at Telnet Cameroon in Buea.',
     },
     '/shop': {
-        title: 'Shop Laptops & Accessories — Telnet Cameroon',
+        title: 'Shop Laptops & Accessories | Telnet Cameroon',
         description:
-            'Quality laptops and accessories from trusted brands — HP, Dell, Lenovo, Acer and more. Message us on WhatsApp for current stock and prices.',
+            'Quality laptops and accessories from trusted brands like HP, Dell, Lenovo, Acer and more. Message us on WhatsApp for current stock and prices.',
     },
     '/internship': {
-        title: 'Internship Programs — Telnet Cameroon',
+        title: 'Internship Programs | Telnet Cameroon',
         description:
-            'Apply for a Telnet Cameroon internship — academic, professional and short programs in networking, cybersecurity, software engineering and more.',
+            'Apply for a Telnet Cameroon internship: academic, professional and short programs in networking, cybersecurity, software engineering and more.',
     },
     '/contact': {
-        title: 'Contact Telnet Cameroon — Molyko, Buea',
+        title: 'Contact Telnet Cameroon | Molyko, Buea',
         // No phone number or opening days here on purpose: contact details are
         // CMS-editable and a description is a static string, so anything written
         // in would go stale the moment it changed. Both live in the page and in
         // the LocalBusiness markup, which follow the CMS.
         description:
-            'Reach Telnet Cameroon in Molyko-Buea for tech support, quotes or enquiries about laptops, CCTV, networking and training — call, email or WhatsApp us.',
+            'Reach Telnet Cameroon in Molyko-Buea for tech support, quotes or enquiries about laptops, CCTV, networking and training. Call, email or WhatsApp us.',
     },
 }
 
 // Routes that must never be indexed.
 export const NOINDEX_ROUTES = ['/admin/login', '/admin']
 
-/** Percent-encodes each path segment — many asset filenames contain spaces. */
+/** Percent-encodes each path segment; many asset filenames contain spaces. */
 export function encodePath(pathname = '/') {
     const path = pathname.startsWith('/') ? pathname : `/${pathname}`
     return path.split('/').map(encodeURIComponent).join('/').replace(/%2F/g, '/')
@@ -230,7 +230,7 @@ function truncate(text, max = 155) {
 export function shopCategoryMeta(categoryName, categoryDescription, pathname) {
     const name = categoryName || 'Shop'
     return resolveMeta(pathname, {
-        title: truncate(`${name} — Shop | ${SITE_NAME}`, 60),
+        title: truncate(`${name} | Shop | ${SITE_NAME}`, 60),
         description: truncate(
             categoryDescription ||
                 `Browse ${name.toLowerCase()} available from Telnet Cameroon in Buea. Message us on WhatsApp for current stock and prices.`
@@ -255,7 +255,7 @@ export function shopProductMeta(product, categoryName, pathname) {
     const descriptionSource =
         product.description ||
         `${displayName} available from Telnet Cameroon in Buea${
-            parts.length ? ` — ${parts.join(', ')}` : ''
+            parts.length ? `: ${parts.join(', ')}` : ''
         }. Message us on WhatsApp to check availability.`
 
     return resolveMeta(pathname, {

@@ -1,13 +1,13 @@
 // The admin-editable contact record (Admin → Content → Contact Details),
 // stored in Supabase under the `contact_info` setting.
 //
-// scripts/prerender.js seeds it into the static HTML so the first render — and
-// anything a non-JS crawler reads — already carries the real values instead of
+// scripts/prerender.js seeds it into the static HTML so the first render (and
+// anything a non-JS crawler reads) already carries the real values instead of
 // the fallbacks compiled into the bundle.
 
 /**
  * The one set of fallbacks for contact details, used when the stored record is
- * missing or unreachable. Everything else — seo.js, whatsapp.js, Contact.jsx —
+ * missing or unreachable. Everything else (seo.js, whatsapp.js, Contact.jsx)
  * derives from here rather than keeping its own copy, which is how the previous
  * three copies managed to drift apart and start publishing a dead phone number.
  *
@@ -79,8 +79,8 @@ function to24Hour(raw) {
 /**
  * Turns the free-text hours field into schema.org OpeningHoursSpecification.
  *
- * Handles the shapes the field actually holds — "Mon – Fri: 8am – 6pm",
- * "Saturday: 9am – 4pm" — and returns null the moment any line doesn't parse.
+ * Handles the shapes the field actually holds ("Mon – Fri: 8am – 6pm",
+ * "Saturday: 9am – 4pm") and returns null the moment any line doesn't parse.
  * The field is free text an admin can type anything into, and publishing
  * *wrong* opening hours to Google is worse than publishing none.
  */

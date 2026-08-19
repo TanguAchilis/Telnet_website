@@ -3,7 +3,7 @@
 // The sitemap and the prerenderer both need the shop's public URLs, and the
 // prerenderer also needs the contact record. All of it comes from Supabase over
 // the public REST endpoint using the same publishable key the browser already
-// uses — those rows are anon-readable under the existing RLS policy, so the
+// uses; those rows are anon-readable under the existing RLS policy, so the
 // build gains no extra privilege.
 
 import { readFile } from 'node:fs/promises'
@@ -52,7 +52,7 @@ async function query(env, path) {
  *
  * Baked into the prerendered HTML so the first render already has the right
  * WhatsApp number. Without it the app boots with the hardcoded fallback and
- * only corrects itself once the runtime fetch resolves — which the snapshot
+ * only corrects itself once the runtime fetch resolves, which the snapshot
  * can win the race against, producing pages with two different numbers on them.
  *
  * Returns null if the row is absent or unreadable; callers fall back to the
@@ -75,7 +75,7 @@ export async function fetchContactInfo(env) {
  * Products whose category is inactive or deleted have no reachable URL, so
  * they're counted as orphaned rather than emitted.
  *
- * Throws if Supabase is unreachable — callers decide whether that's fatal.
+ * Throws if Supabase is unreachable; callers decide whether that's fatal.
  * Neither current caller treats it as fatal.
  */
 export async function fetchShopRoutes(env) {

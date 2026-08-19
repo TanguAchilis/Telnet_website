@@ -169,7 +169,7 @@ async function callEdgeFunction(name, body) {
 
     const result = await res.json().catch(() => ({}))
     if (!res.ok) {
-        // `message` covers Supabase's own envelope — a function that hasn't been
+        // `message` covers Supabase's own envelope; a function that hasn't been
         // deployed yet returns that shape, not ours.
         const error = new Error(result.error || result.message || `${name} failed (${res.status}).`)
         error.status = res.status

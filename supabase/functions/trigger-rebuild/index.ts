@@ -1,6 +1,6 @@
 // Triggers a Vercel rebuild so CMS edits reach crawlers.
 //
-// Visitors always see live data — the SPA fetches from Supabase on mount. But
+// Visitors always see live data, since the SPA fetches from Supabase on mount. But
 // scripts/prerender.js bakes a build-time snapshot into the static HTML, and
 // that snapshot is what Google and WhatsApp read. Without a rebuild, a price
 // change never reaches a search snippet or a link preview.

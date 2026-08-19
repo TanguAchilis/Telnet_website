@@ -8,7 +8,7 @@ export default function AdminLogin() {
     const navigate = useNavigate()
 
     useSeo({
-        title: 'Admin Login — Telnet Cameroon',
+        title: 'Admin Login | Telnet Cameroon',
         description: 'Administration area.',
         noindex: true,
     })
@@ -37,7 +37,7 @@ export default function AdminLogin() {
                 <div className="alog-header">
                     <img src="/Our team/logo.png" alt="Telnet" className="alog-logo" />
                     <h1 className="alog-title">Admin Portal</h1>
-                    <p className="alog-subtitle">Telnet Cameroon — Admin Access</p>
+                    <p className="alog-subtitle">Telnet Cameroon Admin Access</p>
                 </div>
 
                 {error && (
@@ -87,7 +87,7 @@ export default function AdminLogin() {
                 </div>
 
                 <p className="alog-note">
-                    Restricted access — authorised personnel only.
+                    Restricted access. Authorised personnel only.
                 </p>
             </div>
         </div>

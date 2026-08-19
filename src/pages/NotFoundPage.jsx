@@ -13,7 +13,7 @@ const suggestions = [
 
 export default function NotFoundPage() {
     useSeo({
-        title: 'Page not found — Telnet Cameroon',
+        title: 'Page not found | Telnet Cameroon',
         description: 'The page you are looking for does not exist or has moved.',
         noindex: true,
     })

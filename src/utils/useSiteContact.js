@@ -8,7 +8,7 @@ import { setWhatsAppNumber } from './whatsapp'
 setWhatsAppNumber(getSiteContact().whatsapp)
 
 /**
- * The admin-editable contact record — phone, email, address, hours, WhatsApp.
+ * The admin-editable contact record: phone, email, address, hours, WhatsApp.
  *
  * Starts from the value baked into the page at build time and refreshes from
  * Supabase on mount, so edits made since the last publish still reach visitors.
