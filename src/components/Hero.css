@@ -1,5 +1,5 @@
 /* ============================================
-   HERO CAROUSEL — Premium Full-Screen Slider
+   HERO CAROUSEL: Premium Full-Screen Slider
    ============================================ */
 
 .hero {
@@ -78,8 +78,10 @@
 
 /* --- Badge --- */
 .hero-badge {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem 0.5rem 1rem;
     background: rgba(232, 103, 60, 0.12);
     border: 1px solid rgba(223, 145, 88, 0.28);
     border-radius: var(--radius-full);

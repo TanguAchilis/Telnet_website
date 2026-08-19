@@ -11,6 +11,7 @@ import {
     validateInternshipApplication,
 } from '../utils/internshipValidation'
 import './InternshipApplication.css'
+import { Icon } from '../icons'
 
 const learningModes = [
     {
@@ -254,7 +255,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
 
     // When a submit/next is blocked by missing fields, jump straight to the
     // FIRST empty field, focus it, and play an attention animation so the user
-    // can't miss it — regardless of where they were scrolled on a long step.
+    // can't miss it, regardless of where they were scrolled on a long step.
     useEffect(() => {
         if (!pendingErrorFocus.current) return
         pendingErrorFocus.current = false
@@ -432,7 +433,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
             setSubmitStatus({
                 type: 'error',
                 message: firstInvalidStep !== -1 && firstInvalidStep !== finalStepIndex
-                    ? `Some required details are incomplete — we've taken you back to fix ${missingCount === 1 ? 'it' : 'them'}.`
+                    ? `Some required details are incomplete. We've taken you back to fix ${missingCount === 1 ? 'it' : 'them'}.`
                     : 'Please complete the highlighted fields before submitting.',
             })
 
@@ -467,9 +468,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                 {submitted ? (
                     <div className="ia-success">
                         <div className="ia-success-icon">
-                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <polyline points="20 6 9 17 4 12" />
-                            </svg>
+                            <Icon name="check" size={34} weight={2.4} />
                         </div>
                         <h2 className="ia-success-title">Application Submitted!</h2>
                         <p className="ia-success-msg">
@@ -496,10 +495,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                                 <p className="ia-step-desc">{currentStepConfig.description}</p>
                             </div>
                             <button className="ia-close" type="button" onClick={handleClose} aria-label="Close application form" disabled={isSubmitting}>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
+                                <Icon name="close" size={18} weight={2.2} />
                             </button>
                         </div>
 
@@ -509,9 +505,7 @@ export default function InternshipApplication({ isOpen, onClose }) {
                                     <div className={`ia-prog-step${index === currentStep ? ' ia-prog-active' : index < currentStep ? ' ia-prog-done' : ''}`}>
                                         <div className="ia-prog-dot">
                                             {index < currentStep ? (
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                                    <polyline points="20 6 9 17 4 12" />
-                                                </svg>
+                                                <Icon name="check" size={12} weight={3} />
                                             ) : (
                                                 <span>{index + 1}</span>
                                             )}

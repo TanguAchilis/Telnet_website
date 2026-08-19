@@ -115,14 +115,21 @@
 }
 
 .value-icon {
-    font-size: 2.8rem;
-    filter: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border-radius: var(--radius-lg);
+    background: var(--color-accent-glow);
+    color: var(--color-accent);
     transition: all var(--transition-base);
 }
 
 .value-item:hover .value-icon {
-    transform: scale(1.12);
-    filter: drop-shadow(0 0 10px rgba(200, 96, 28, 0.2));
+    transform: scale(1.08);
+    background: var(--color-accent-glow-strong);
+    box-shadow: 0 0 18px rgba(232, 103, 60, 0.1);
 }
 
 .value-label {

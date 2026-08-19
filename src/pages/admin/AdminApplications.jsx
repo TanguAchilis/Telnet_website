@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchApplications } from '../../utils/admin'
 import './admin.css'
+import { Icon } from '../../icons'
 
 const PAGE_SIZE = 25
 
@@ -88,9 +89,7 @@ export default function AdminApplications() {
 
             <div className="ap-toolbar">
                 <div className="ap-search">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
+                    <Icon name="search" size={15} weight={2.2} />
                     <input
                         type="search"
                         placeholder="Search name, email or phone…"
@@ -110,7 +109,7 @@ export default function AdminApplications() {
                     <div className="ap-loading"><span className="ap-spinner" />Loading…</div>
                 ) : apps.length === 0 ? (
                     <div className="ap-empty">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                        <Icon name="file-text" size={36} />
                         <strong>No applications found</strong>
                         <p>Try adjusting your search or filters.</p>
                     </div>
@@ -134,17 +133,17 @@ export default function AdminApplications() {
                                     className="ap-table-link"
                                     onClick={() => navigate(`/admin/applications/${app.id}`)}
                                 >
-                                    <td className="ap-table-name">{app.full_name || '—'}</td>
-                                    <td className="ap-table-muted">{app.email || '—'}</td>
-                                    <td>{app.program_option || '—'}</td>
-                                    <td className="ap-table-muted">{app.mode_of_learning || '—'}</td>
+                                    <td className="ap-table-name">{app.full_name || '-'}</td>
+                                    <td className="ap-table-muted">{app.email || '-'}</td>
+                                    <td>{app.program_option || '-'}</td>
+                                    <td className="ap-table-muted">{app.mode_of_learning || '-'}</td>
                                     <td>
                                         <span className={`ap-badge ap-badge-${app.status}`}>
                                             {STATUS_LABEL[app.status] || app.status}
                                         </span>
                                     </td>
                                     <td className="ap-table-muted">
-                                        {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '—'}
+                                        {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '-'}
                                     </td>
                                     <td>
                                         <button

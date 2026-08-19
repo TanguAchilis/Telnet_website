@@ -1,16 +1,17 @@
 import Hero from '../components/Hero'
 import Services from '../components/Services'
 import About from '../components/About'
+import { Icon } from '../icons'
 import './HomePage.css'
 
 const whatWeDo = [
-    { icon: '💻', label: 'Laptop Sales & Accessories' },
-    { icon: '💡', label: 'Low-cost IT Solutions' },
-    { icon: '📹', label: 'CCTV & Networking' },
-    { icon: '📋', label: 'IT Consultancy' },
-    { icon: '🔒', label: 'Cybersecurity' },
-    { icon: '🎓', label: 'Internship' },
-    { icon: '🔧', label: 'Hardware Maintenance' },
+    { icon: 'laptop', label: 'Laptop Sales & Accessories' },
+    { icon: 'lightbulb', label: 'Low-cost IT Solutions' },
+    { icon: 'cctv', label: 'CCTV & Networking' },
+    { icon: 'clipboard', label: 'IT Consultancy' },
+    { icon: 'shield', label: 'Cybersecurity' },
+    { icon: 'graduation', label: 'Internship' },
+    { icon: 'wrench', label: 'Hardware Maintenance' },
 ]
 
 export default function HomePage() {
@@ -25,7 +26,7 @@ export default function HomePage() {
                     <div className="what-we-do-grid">
                         {whatWeDo.map((item, i) => (
                             <div key={i} className="what-we-do-item glass-card animate-on-scroll">
-                                <span className="what-we-do-icon">{item.icon}</span>
+                                <Icon name={item.icon} size={20} className="what-we-do-icon" />
                                 <span className="what-we-do-label">{item.label}</span>
                             </div>
                         ))}

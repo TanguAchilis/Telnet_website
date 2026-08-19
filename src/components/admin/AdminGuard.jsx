@@ -8,7 +8,7 @@ export default function AdminGuard() {
 
     // Admin pages sit outside PublicLayout, so nothing else sets their head.
     useSeo({
-        title: 'Admin — Telnet Cameroon',
+        title: 'Admin | Telnet Cameroon',
         description: 'Administration area.',
         noindex: true,
     })

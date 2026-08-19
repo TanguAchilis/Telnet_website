@@ -1,7 +1,7 @@
 // Build-time prerender for a client-rendered SPA.
 //
 // Vite emits a single dist/index.html, and vercel.json rewrites every path to
-// it — so every route served identical <head> content. Crawlers that don't run
+// it, so every route served identical <head> content. Crawlers that don't run
 // JavaScript (Bing, and every social scraper: WhatsApp, Facebook, LinkedIn, X)
 // saw the homepage's title and no OG tags on every URL.
 //
@@ -58,7 +58,7 @@ async function main() {
     try {
         shell = await readFile(shellPath, 'utf8')
     } catch {
-        console.error('[prerender] dist/index.html not found — run vite build first.')
+        console.error('[prerender] dist/index.html not found. Run vite build first.')
         process.exitCode = 1
         return
     }
@@ -66,7 +66,7 @@ async function main() {
     if (!shell.includes(PLACEHOLDER)) {
         console.error(
             `[prerender] ${PLACEHOLDER} missing from dist/index.html.\n` +
-                '            Restore it in index.html — without it, every route ships the homepage meta.'
+                '            Restore it in index.html; without it, every route ships the homepage meta.'
         )
         process.exitCode = 1
         return
@@ -107,7 +107,7 @@ async function main() {
     await assertVercelRoutesInSync(written)
 
     // Shop URLs are data-driven, so they can't be listed in vercel.json. They
-    // rely on Vercel's filesystem check running before rewrites — which this
+    // rely on Vercel's filesystem check running before rewrites, which this
     // deployment already demonstrates, since /assets/*.js is served despite the
     // same catch-all. If it ever didn't, these would fall through to the SPA
     // shell: today's behaviour, not a regression.
@@ -117,7 +117,7 @@ async function main() {
 }
 
 /**
- * The admin-editable contact record, or null if Supabase is unreachable — in
+ * The admin-editable contact record, or null if Supabase is unreachable. In
  * which case everything downstream falls back to the constants in seo.js.
  */
 async function loadContactInfo() {
@@ -126,7 +126,7 @@ async function loadContactInfo() {
     try {
         return await fetchContactInfo(env)
     } catch (error) {
-        console.warn(`[prerender] contact_info unavailable (${error.message}) — using compiled-in fallback.`)
+        console.warn(`[prerender] contact_info unavailable (${error.message}); using compiled-in fallback.`)
         return null
     }
 }
@@ -138,7 +138,7 @@ async function loadContactInfo() {
  * Without it the bundle boots with its compiled-in fallback and only corrects
  * itself once the runtime fetch resolves. Visitors on a slow connection would
  * briefly see the wrong number, and the snapshot could win the race against the
- * re-render — which produced prerendered pages carrying two different numbers.
+ * re-render, which produced prerendered pages carrying two different numbers.
  */
 function buildContactScript(contact) {
     if (!contact) return null
@@ -159,7 +159,7 @@ async function writeShell(shell, route, head, title) {
 
 /**
  * Writes shells for every shop category and product, with per-item metadata
- * and JSON-LD built from the same functions the runtime uses — so a product's
+ * and JSON-LD built from the same functions the runtime uses, so a product's
  * static HTML carries its own title, description, OG image and Product schema
  * rather than the homepage fallback.
  *
@@ -168,7 +168,7 @@ async function writeShell(shell, route, head, title) {
 async function writeShopShells(shell, siteJsonLd, contactScript) {
     const env = await loadSupabaseEnv()
     if (!env.url || !env.key) {
-        console.warn('[prerender] no Supabase credentials — shop routes not prerendered.')
+        console.warn('[prerender] no Supabase credentials; shop routes not prerendered.')
         return []
     }
 
@@ -176,7 +176,7 @@ async function writeShopShells(shell, siteJsonLd, contactScript) {
     try {
         data = await fetchShopRoutes(env)
     } catch (error) {
-        console.warn(`[prerender] Supabase query failed (${error.message}) — shop routes not prerendered.`)
+        console.warn(`[prerender] Supabase query failed (${error.message}); shop routes not prerendered.`)
         return []
     }
 
@@ -239,7 +239,7 @@ async function snapshotBodies(routes) {
     try {
         ;({ default: puppeteer } = await import('puppeteer'))
     } catch (error) {
-        console.warn('[prerender] puppeteer not installed — keeping head-only output.')
+        console.warn('[prerender] puppeteer not installed; keeping head-only output.')
         await writeReport({ ok: false, reason: 'puppeteer-not-installed', detail: error.message, routes: routes.length })
         return
     }
@@ -254,7 +254,7 @@ async function snapshotBodies(routes) {
         })
     } catch (error) {
         console.warn(
-            `[prerender] could not launch Chrome (${error.message.split('\n')[0]}) — keeping head-only output.\n` +
+            `[prerender] could not launch Chrome (${error.message.split('\n')[0]}); keeping head-only output.\n` +
                 '            Pages still ship correct metadata; only the rendered body is missing.'
         )
         await writeReport({
@@ -278,7 +278,7 @@ async function snapshotBodies(routes) {
         for (const route of routes) {
             try {
                 // The flag freezes time-based UI (see src/utils/isPrerender.js).
-                // It never reaches the written file — only this build-time load.
+                // It never reaches the written file, only this build-time load.
                 const body = await renderRoute(page, `${server.origin}${route}?__prerender=1`)
                 await injectBody(route, body)
                 ok.push(route)
@@ -302,7 +302,7 @@ async function snapshotBodies(routes) {
  * Writes the snapshot outcome to dist/_seo-prerender.json.
  *
  * The body snapshot degrades silently by design, which makes a partial failure
- * invisible from outside — and Vercel build logs aren't always reachable by
+ * invisible from outside, and Vercel build logs aren't always reachable by
  * whoever needs to diagnose it. Publishing the outcome alongside the site means
  * `curl <url>/_seo-prerender.json` answers "did prerendering work?" without any
  * dashboard access. Counts and an error string only; nothing sensitive.
@@ -328,7 +328,7 @@ async function renderRoute(page, url) {
     })
 
     // Then for the Supabase fetches to settle. Not fatal if it never goes fully
-    // idle — we'd rather snapshot a mostly-loaded page than nothing.
+    // idle; we'd rather snapshot a mostly-loaded page than nothing.
     await page.waitForNetworkIdle({ idleTime: 600, timeout: IDLE_TIMEOUT_MS }).catch(() => {})
 
     // Spinners mean data is still in flight; give them one more moment.
@@ -339,7 +339,7 @@ async function renderRoute(page, url) {
     return page.evaluate(() => {
         // Scroll-reveal elements start at opacity 0 until IntersectionObserver
         // adds .visible. Without this the static paint would be mostly blank
-        // above the fold — the text is in the DOM either way, but a human
+        // above the fold. The text is in the DOM either way, but a human
         // seeing the prerender before JS boots should see the page.
         document.querySelectorAll('.animate-on-scroll').forEach((el) => el.classList.add('visible'))
         return document.getElementById('root').innerHTML
@@ -366,7 +366,7 @@ async function injectBody(route, body) {
  *      `/index.html`. Under `cleanUrls: true` Vercel 308-redirects
  *      `/index.html` to `/`, so a rewrite pointing there resolves to nothing
  *      and every unmatched route hard-404s instead of falling back to the SPA.
- *      A `/((?!api/).*)` source was also tried and silently matched nothing —
+ *      A `/((?!api/).*)` source was also tried and silently matched nothing,
  *      Vercel compiles `source` with path-to-regexp, not JS RegExp. That
  *      exclusion isn't needed anyway: the filesystem, static files and api/
  *      functions alike, resolves before rewrites.
@@ -377,7 +377,7 @@ async function injectBody(route, body) {
  *      listed here. The per-route rewrites below are belt-and-braces.
  *
  * Vercel checks the filesystem before applying rewrites, so the prerendered
- * files would probably be picked up anyway — but "probably" is not good enough
+ * files would probably be picked up anyway, but "probably" is not good enough
  * for the thing the whole SEO pass rests on. vercel.json therefore names each
  * route explicitly, ahead of the SPA catch-all.
  *
@@ -392,7 +392,7 @@ async function assertVercelRoutesInSync(routes) {
     try {
         config = JSON.parse(await readFile(configPath, 'utf8'))
     } catch {
-        console.warn('[prerender] vercel.json unreadable — skipping route sync check.')
+        console.warn('[prerender] vercel.json unreadable; skipping route sync check.')
         return
     }
 

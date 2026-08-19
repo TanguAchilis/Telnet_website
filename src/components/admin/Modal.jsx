@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { Icon } from '../../icons'
 
 export default function Modal({ open, title, onClose, children, footer }) {
     useEffect(() => {
@@ -20,7 +21,7 @@ export default function Modal({ open, title, onClose, children, footer }) {
             <div className="acms-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
                 <div className="acms-modal-hdr">
                     <h3>{title}</h3>
-                    <button type="button" className="acms-modal-close" onClick={onClose} aria-label="Close">✕</button>
+                    <button type="button" className="acms-modal-close" onClick={onClose} aria-label="Close"><Icon name="close" size={16} weight={2.2} /></button>
                 </div>
                 <div className="acms-modal-body">{children}</div>
                 {footer && <div className="acms-modal-foot">{footer}</div>}

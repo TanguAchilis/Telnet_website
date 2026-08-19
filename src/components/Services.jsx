@@ -1,42 +1,43 @@
 import { useEffect, useState } from 'react'
 import { getWhatsAppUrl } from '../utils/whatsapp'
 import { fetchServices } from '../utils/content'
+import { Icon, resolveIconName } from '../icons'
 import './Services.css'
 
 // Fallback content (used before the CMS migration is run / DB is empty).
 const DEFAULT_SERVICES = [
     {
-        icon: '💻',
+        icon: 'laptop',
         title: 'Laptop Sales',
         description: 'We provide high-quality laptops and accessories suitable for students, professionals, and businesses. Our products come from trusted brands like HP, Dell, Lenovo and more.',
         features: ['Brand New & Refurbished', 'All Accessories', 'Warranty Support'],
     },
     {
-        icon: '📹',
+        icon: 'cctv',
         title: 'Security Camera Installation',
         description: 'Protect your property with reliable surveillance systems. We install modern CCTV solutions from trusted brands for homes, offices, and businesses.',
         features: ['HD & IP Cameras', 'Remote Monitoring', '24/7 Recording'],
     },
     {
-        icon: '🌐',
+        icon: 'wifi',
         title: 'Internet Installation',
         description: 'We install and configure high-speed satellite internet using Starlink technology to ensure reliable connectivity even in remote areas.',
         features: ['Starlink Setup', 'Wi-Fi Configuration', 'Network Optimization'],
     },
     {
-        icon: '🎓',
+        icon: 'graduation',
         title: 'Tech Training',
         description: 'Our training programs help individuals gain practical technology skills including computer fundamentals, networking, CCTV installation, graphic design, and web development.',
         features: ['Computer Fundamentals', 'Networking & CCTV', 'Graphic Design & Web Dev'],
     },
     {
-        icon: '🔧',
+        icon: 'wrench',
         title: 'Hardware Maintenance',
         description: 'Expert repair and maintenance for laptops, desktops, printers, and other IT equipment to keep your systems running.',
         features: ['Diagnosis & Repair', 'Component Upgrade', 'Preventive Care'],
     },
     {
-        icon: '🔒',
+        icon: 'shield',
         title: 'Cybersecurity',
         description: 'Protect your digital assets with our comprehensive cybersecurity solutions, assessments, and awareness training.',
         features: ['Security Audits', 'Data Protection', 'Awareness Training'],
@@ -56,7 +57,9 @@ export default function Services({ showHeader = true }) {
             .then((rows) => {
                 if (active && Array.isArray(rows) && rows.length > 0) {
                     setServices(rows.map((s) => ({
-                        icon: s.icon || '🛠️',
+                        // Rows created before the icon pack shipped still hold
+                        // an emoji; resolveIconName maps those to a real glyph.
+                        icon: resolveIconName(s.icon),
                         title: s.title,
                         description: s.description,
                         features: Array.isArray(s.features) ? s.features : [],
@@ -75,7 +78,7 @@ export default function Services({ showHeader = true }) {
                         <span className="section-label">What We Do</span>
                         <h2 className="section-title">Our <span className="text-gradient-accent">Services</span></h2>
                         <p className="section-subtitle">
-                            Comprehensive technology solutions tailored to your needs — from hardware to security.
+                            Comprehensive technology solutions tailored to your needs, from hardware to security.
                         </p>
                     </div>
                 )}
@@ -87,14 +90,16 @@ export default function Services({ showHeader = true }) {
                             className={`service-card glass-card animate-on-scroll bento-item-${index + 1}`}
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
-                            <div className="service-icon service-icon-emoji">{service.icon}</div>
+                            <div className="service-icon">
+                                <Icon name={service.icon} size={index === 0 ? 38 : 28} />
+                            </div>
                             <h3 className="service-title">{service.title}</h3>
                             <p className="service-desc">{service.description}</p>
                             {service.features.length > 0 && (
                                 <ul className="service-features">
                                     {service.features.map((feature, i) => (
                                         <li key={i}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                            <Icon name="check" size={14} className="service-feature-tick" />
                                             {feature}
                                         </li>
                                     ))}
@@ -106,7 +111,8 @@ export default function Services({ showHeader = true }) {
                                 rel="noopener noreferrer"
                                 className="service-inquire-btn"
                             >
-                                💬 Inquire on WhatsApp
+                                <Icon name="whatsapp" size={16} />
+                                Inquire on WhatsApp
                             </a>
                         </div>
                     ))}

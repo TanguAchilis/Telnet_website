@@ -112,7 +112,15 @@
 }
 
 .volunteer-icon {
-    font-size: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-accent-glow);
+    color: var(--color-accent);
 }
 
 .volunteer-title {

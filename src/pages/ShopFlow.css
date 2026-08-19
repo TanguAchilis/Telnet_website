@@ -1,5 +1,5 @@
 /* ================================================================
-   SHOP FLOW — category listing + product detail
+   SHOP FLOW: category listing + product detail
    ================================================================ */
 
 .shopf-section {
@@ -83,12 +83,9 @@
 }
 
 .shopf-product-placeholder {
-    font-size: 2.5rem;
-    opacity: 0.35;
-}
-
-.shopf-placeholder-lg {
-    font-size: 4rem;
+    display: inline-flex;
+    color: var(--color-gray-400);
+    opacity: 0.55;
 }
 
 .shopf-badge {
@@ -152,9 +149,16 @@
 }
 
 .shopf-product-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--color-text-secondary);
+}
+
+.shopf-product-card:hover .shopf-product-view {
+    color: var(--color-accent);
 }
 
 /* Loading / empty */
@@ -193,7 +197,14 @@
 }
 
 .shopf-empty-icon {
-    font-size: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 68px;
+    height: 68px;
+    border-radius: var(--radius-lg);
+    background: var(--color-accent-glow);
+    color: var(--color-accent);
 }
 
 .shopf-empty h3 {

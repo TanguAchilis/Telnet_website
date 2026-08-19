@@ -12,7 +12,7 @@
 --              spaces.
 --   phone    - displayed in the footer, mobile menu and contact page, and
 --              emitted as `telephone` in the LocalBusiness structured data.
---              Formatting is free — schema.org accepts spaces.
+--              Formatting is free; schema.org accepts spaces.
 --
 -- Only these two keys are touched. email, address and hours stay exactly as the
 -- admin panel last saved them.
@@ -23,8 +23,8 @@ insert into public.admin_settings (key, value, updated_at)
 values (
     'contact_info',
     jsonb_build_object(
-        'whatsapp', '237679837395',
-        'phone', '+237 679 837 395'
+        'whatsapp', '237672595150',
+        'phone', '+237 672 595 150'
     ),
     now()
 )
@@ -35,11 +35,11 @@ set value = jsonb_set(
         jsonb_set(
             coalesce(admin_settings.value, '{}'::jsonb),
             '{whatsapp}',
-            '"237679837395"'::jsonb,
+            '"237672595150"'::jsonb,
             true
         ),
         '{phone}',
-        '"+237 679 837 395"'::jsonb,
+        '"+237 672 595 150"'::jsonb,
         true
     ),
     updated_at = now();

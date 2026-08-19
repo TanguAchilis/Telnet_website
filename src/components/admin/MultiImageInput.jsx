@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { uploadImage } from '../../utils/storage'
+import { Icon } from '../../icons'
 
 export default function MultiImageInput({ images = [], onChange, folder = 'misc', label = 'More photos' }) {
     const [uploading, setUploading] = useState(false)
@@ -41,7 +42,7 @@ export default function MultiImageInput({ images = [], onChange, folder = 'misc'
                     {list.map((url, i) => (
                         <div key={`${url}-${i}`} className="acms-multi-item">
                             <img src={url} alt="" />
-                            <button type="button" className="acms-multi-remove" onClick={() => removeAt(i)} aria-label="Remove image">✕</button>
+                            <button type="button" className="acms-multi-remove" onClick={() => removeAt(i)} aria-label="Remove image"><Icon name="close" size={13} weight={2.4} /></button>
                         </div>
                     ))}
                 </div>

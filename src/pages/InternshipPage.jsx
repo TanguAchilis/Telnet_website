@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import InternshipApplication from '../components/InternshipApplication'
 import { fetchSetting } from '../utils/admin'
 import './PageBanner.css'
+import { Icon } from '../icons'
 
 const learningModes = [
     { value: 'Academic Internship', label: 'Academic Internship', description: 'For students enrolled in institutions of higher learning.' },
@@ -70,7 +71,7 @@ export default function InternshipPage() {
                             <h2 className="internship-cta-title">
                                 Start your <span className="text-gradient-accent">application</span> today.
                             </h2>
-                            <p>Choose your learning path and program — the form takes just a few minutes to complete.</p>
+                            <p>Choose your learning path and program. The form takes just a few minutes to complete.</p>
                         </div>
                         <button
                             type="button"
@@ -78,9 +79,7 @@ export default function InternshipPage() {
                             onClick={() => setIsModalOpen(true)}
                         >
                             <span>Apply Now</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <Icon name="arrow-right" size={18} />
                         </button>
                     </div>
 

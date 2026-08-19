@@ -79,7 +79,7 @@ export function startStaticServer(root) {
                         // existing ones to drain. Chrome holds keep-alive sockets
                         // open, so without closeAllConnections() the callback may
                         // never fire and the build hangs after a successful
-                        // snapshot — intermittently, depending on whether the
+                        // snapshot, intermittently, depending on whether the
                         // browser happened to release its sockets first.
                         server.close(done)
                         server.closeAllConnections?.()

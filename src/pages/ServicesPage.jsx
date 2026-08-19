@@ -9,7 +9,7 @@ export default function ServicesPage() {
                     <span className="page-banner-label">What We Do</span>
                     <h1 className="page-banner-title">Our Services</h1>
                     <p className="page-banner-desc">
-                        Comprehensive technology solutions tailored to your needs — from laptop sales to cybersecurity.
+                        Comprehensive technology solutions tailored to your needs, from laptop sales to cybersecurity.
                     </p>
                 </div>
             </div>

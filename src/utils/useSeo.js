@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { getRouteMeta, metaTagsFor, resolveMeta } from './seo'
 
 // Tags this hook manages are stamped with data-seo so it only ever touches its
-// own nodes — the prerendered tags in index.html carry the same marker and are
+// own nodes; the prerendered tags in index.html carry the same marker and are
 // adopted rather than duplicated.
 const MANAGED = 'data-seo'
 
@@ -22,7 +22,7 @@ function upsert(kind, key, attrs) {
 /**
  * Applies per-route metadata to document.head.
  *
- * Static routes need no arguments — the route map in seo.js supplies everything.
+ * Static routes need no arguments; the route map in seo.js supplies everything.
  * Dynamic routes (shop category, product) pass a pre-built meta object from
  * shopCategoryMeta() / shopProductMeta().
  *
@@ -33,12 +33,12 @@ function upsert(kind, key, attrs) {
 export function useSeo(metaOrOverrides) {
     const { pathname } = useLocation()
 
-    // Pass null to leave the head untouched — used while a dynamic page is still
+    // Pass null to leave the head untouched, used while a dynamic page is still
     // loading, so it doesn't briefly advertise the wrong title.
     const skip = metaOrOverrides === null
 
-    // Serialised so a caller passing a fresh object literal each render — the
-    // normal case — doesn't retrigger the effect on every render.
+    // Serialised so a caller passing a fresh object literal each render (the
+    // normal case) doesn't retrigger the effect on every render.
     const resolved = skip
         ? null
         : metaOrOverrides?.canonical

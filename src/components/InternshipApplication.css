@@ -1,5 +1,5 @@
 ﻿/* ============================================================
-   INTERNSHIP APPLICATION — Modal & Page Styles
+   INTERNSHIP APPLICATION: Modal & Page Styles
    ============================================================ */
 
 /* --- Keyframes --- */
@@ -356,7 +356,7 @@
 }
 
 /* ============================================================
-   ATTENTION ANIMATION — drives the eye to the first empty field
+   ATTENTION ANIMATION: drives the eye to the first empty field
    when a submit/next is blocked by validation.
    ============================================================ */
 @keyframes iaAttentionShake {
@@ -739,7 +739,7 @@
 }
 
 /* ============================================================
-   INTERNSHIP PAGE — CTA BANNER
+   INTERNSHIP PAGE: CTA BANNER
    ============================================================ */
 .internship-section {
     padding-top: var(--space-3xl);
@@ -800,7 +800,7 @@
 }
 
 /* ============================================================
-   INTERNSHIP PAGE — OVERVIEW CARDS
+   INTERNSHIP PAGE: OVERVIEW CARDS
    ============================================================ */
 .internship-overview-grid {
     display: grid;

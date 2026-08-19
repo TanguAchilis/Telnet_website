@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchTeamMembers } from '../utils/content'
+import { Icon } from '../icons'
 import './Team.css'
 
 // Fallback content (used before the CMS migration is run / DB is empty).
@@ -75,7 +76,7 @@ export default function Team({ showHeader = true }) {
 
                 <div className="team-volunteers animate-on-scroll">
                     <div className="volunteer-badge glass-card">
-                        <span className="volunteer-icon">🤝</span>
+                        <span className="volunteer-icon"><Icon name="users" size={26} /></span>
                         <div>
                             <h4 className="volunteer-title">Volunteers</h4>
                             <p className="volunteer-text">Our dedicated volunteers support our mission to bridge the digital divide.</p>

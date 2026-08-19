@@ -1,8 +1,8 @@
-# Copilot Instructions — Telnet Cameroon Website
+# Copilot Instructions for the Telnet Cameroon Website
 
 ## Project Overview
 
-Marketing/portfolio website for **Telnet Cameroon**, an IT solutions company in Buea, Cameroon. Built with **React 19 + Vite 7**, using **react-router-dom v7** for client-side routing. Pure CSS styling (no UI library). No backend — all "contact" actions redirect to WhatsApp.
+Marketing/portfolio website for **Telnet Cameroon**, an IT solutions company in Buea, Cameroon. Built with **React 19 + Vite 7**, using **react-router-dom v7** for client-side routing. Pure CSS styling (no UI library). No backend; all "contact" actions redirect to WhatsApp.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ Marketing/portfolio website for **Telnet Cameroon**, an IT solutions company in 
 Every section (Services, About, Team, Gallery, Shop, Contact) exists as a **reusable component** in `src/components/` and a **thin page wrapper** in `src/pages/`. Pages add a `PageBanner` header and render the component with `showHeader={false}`:
 
 ```jsx
-// src/pages/ServicesPage.jsx — typical page pattern
+// src/pages/ServicesPage.jsx, a typical page pattern
 <div className="page-banner">...</div>
 <Services showHeader={false} />
 ```
@@ -26,10 +26,10 @@ All routes defined in `src/App.jsx`. Seven flat routes: `/`, `/services`, `/abou
 
 ### WhatsApp Integration (no backend)
 
-All CTAs route to WhatsApp via `src/utils/whatsapp.js`. This is the primary contact mechanism — there is no form submission endpoint.
+All CTAs route to WhatsApp via `src/utils/whatsapp.js`. This is the primary contact mechanism; there is no form submission endpoint.
 
-- `getWhatsAppUrl(message)` — builds `wa.me` URL with pre-drafted text
-- `whatsappMessages` — object of keyed message templates (e.g., `laptopSales`, `cctv`, `quote`)
+- `getWhatsAppUrl(message)` builds a `wa.me` URL with pre-drafted text
+- `whatsappMessages` is an object of keyed message templates (e.g., `laptopSales`, `cctv`, `quote`)
 - Components reference messages by key: `whatsappMessages[cat.whatsappKey]`
 - Phone number constant: `237671827893`
 
@@ -51,7 +51,7 @@ Content data (services, team members, shop categories, gallery images) is define
 
 ### Static Assets
 
-- Team photos and images: `public/Our team/` (spaces in path — always quote in URLs)
+- Team photos and images: `public/Our team/` (spaces in path, so always quote in URLs)
 - Image references use absolute paths from public root: `"/Our team/logo.png"`, `"/Our team/other images/training sesseions.jpg"`
 - Logo: `/Our team/logo.png`
 
@@ -61,7 +61,7 @@ All components use `export default function ComponentName()` syntax (named funct
 
 ### Icons
 
-Inline SVGs throughout — no icon library. Copy existing SVG patterns when adding new icons.
+All icons come from the in-house pack in `src/icons/`. Add new glyphs to `src/icons/library.jsx` and render them with `<Icon name="..." />`. Never inline an `<svg>` in a component; see `src/icons/README.md`.
 
 ## Development
 

@@ -52,8 +52,6 @@
 }
 
 .shop-arrow {
-    font-size: 1.1rem;
-    font-weight: 700;
     color: var(--color-accent);
     transition: transform var(--transition-base);
 }
@@ -68,8 +66,8 @@
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), var(--shadow-warm);
 }
 
-.shop-emoji {
-    font-size: 2rem;
+.shop-card-icon {
+    color: var(--color-accent);
     margin-bottom: var(--space-lg);
     display: inline-flex;
     align-items: center;
@@ -83,7 +81,7 @@
     transition: all var(--transition-base);
 }
 
-.shop-card:hover .shop-emoji {
+.shop-card:hover .shop-card-icon {
     transform: scale(1.1);
     background: var(--color-accent-glow);
     border-color: rgba(200, 96, 28, 0.2);

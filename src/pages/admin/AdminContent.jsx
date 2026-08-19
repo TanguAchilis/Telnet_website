@@ -9,6 +9,7 @@ import Modal from '../../components/admin/Modal'
 import ImageUpload from '../../components/admin/ImageUpload'
 import './admin.css'
 import './AdminCms.css'
+import { Icon, resolveIconName, SERVICE_ICON_CHOICES } from '../../icons'
 
 const DEFAULT_STATS = { happy_clients: '500+', interns_trained: '50+', years_experience: '3+' }
 const DEFAULT_CONTACT = { phone: '', email: '', address: '', whatsapp: '', hours: '' }
@@ -188,7 +189,7 @@ export default function AdminContent() {
                             <input className="ap-input" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
                         </div>
                         <div className="ap-form-group">
-                            <label className="ap-label">WhatsApp number — customer contact</label>
+                            <label className="ap-label">WhatsApp number (customer contact)</label>
                             <input
                                 className="ap-input"
                                 value={contact.whatsapp}
@@ -197,7 +198,7 @@ export default function AdminContent() {
                                 inputMode="tel"
                             />
                             <p className="acms-hint">
-                                Every &ldquo;Chat on WhatsApp&rdquo; button on the site points here — the navbar
+                                Every &ldquo;Chat on WhatsApp&rdquo; button on the site points here: the navbar
                                 quote button, the floating bubble, hero, footer, services, shop and product
                                 enquiries. Include the country code; spaces and
                                 {' '}
@@ -223,12 +224,12 @@ export default function AdminContent() {
             <div className="ap-card acms-card">
                 <div className="acms-card-hdr">
                     <p className="ap-card-title" style={{ margin: 0 }}>Services</p>
-                    <button className="ap-btn ap-btn-primary ap-btn-sm" onClick={() => { setModalError(''); setSvcModal({ icon: '', title: '', description: '', featuresText: '', is_active: true, sort_order: services.length + 1 }) }}>+ Add Service</button>
+                    <button className="ap-btn ap-btn-primary ap-btn-sm" onClick={() => { setModalError(''); setSvcModal({ icon: 'wrench', title: '', description: '', featuresText: '', is_active: true, sort_order: services.length + 1 }) }}>+ Add Service</button>
                 </div>
                 <div className="acms-list">
                     {services.map((s) => (
                         <div key={s.id} className="acms-list-row">
-                            <span className="acms-list-emoji">{s.icon || '🛠️'}</span>
+                            <span className="acms-list-icon"><Icon name={resolveIconName(s.icon)} size={22} /></span>
                             <div className="acms-list-main">
                                 <strong>{s.title}{!s.is_active && <span className="acms-muted-tag">hidden</span>}</strong>
                                 <span className="acms-list-sub">{s.description}</span>
@@ -253,7 +254,7 @@ export default function AdminContent() {
                     {team.map((m) => (
                         <div key={m.id} className="acms-tile">
                             <div className="acms-tile-media acms-tile-media-portrait">
-                                {m.photo_url ? <img src={m.photo_url} alt="" /> : <span>👤</span>}
+                                {m.photo_url ? <img src={m.photo_url} alt="" /> : <span><Icon name="user" size={26} /></span>}
                             </div>
                             <div className="acms-tile-body">
                                 <strong>{m.name}</strong>
@@ -283,9 +284,22 @@ export default function AdminContent() {
                     <div className="acms-form">
                         {modalError && <div className="ap-alert ap-alert-error">{modalError}</div>}
                         <div className="acms-form-row">
-                            <div className="ap-form-group acms-emoji-field">
-                                <label className="ap-label">Icon (emoji)</label>
-                                <input className="ap-input" value={svcModal.icon || ''} onChange={(e) => setSvcModal({ ...svcModal, icon: e.target.value })} placeholder="💻" />
+                            <div className="ap-form-group acms-icon-field">
+                                <label className="ap-label">Icon</label>
+                                <div className="acms-icon-picker">
+                                    <span className="acms-icon-preview">
+                                        <Icon name={resolveIconName(svcModal.icon)} size={22} />
+                                    </span>
+                                    <select
+                                        className="ap-input"
+                                        value={resolveIconName(svcModal.icon)}
+                                        onChange={(e) => setSvcModal({ ...svcModal, icon: e.target.value })}
+                                    >
+                                        {SERVICE_ICON_CHOICES.map((choice) => (
+                                            <option key={choice.name} value={choice.name}>{choice.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                             <div className="ap-form-group" style={{ flex: 1 }}>
                                 <label className="ap-label">Title</label>

@@ -35,17 +35,17 @@ async function main() {
 
     const env = await loadSupabaseEnv()
     if (!env.url || !env.key) {
-        console.warn('[sitemap] no Supabase credentials — writing static routes only. Shop URLs omitted.')
+        console.warn('[sitemap] no Supabase credentials; writing static routes only. Shop URLs omitted.')
     } else {
         try {
             const { categories, products, orphaned } = await fetchShopRoutes(env)
             for (const c of categories) urls.push({ loc: canonicalFor(c.path) })
             for (const p of products) urls.push({ loc: canonicalFor(p.path), lastmod: p.lastmod })
             if (orphaned) {
-                console.warn(`[sitemap] skipped ${orphaned} product(s) with no active category — not reachable by URL.`)
+                console.warn(`[sitemap] skipped ${orphaned} product(s) with no active category; not reachable by URL.`)
             }
         } catch (error) {
-            console.warn(`[sitemap] Supabase query failed (${error.message}) — writing static routes only.`)
+            console.warn(`[sitemap] Supabase query failed (${error.message}); writing static routes only.`)
         }
     }
 
@@ -55,7 +55,7 @@ async function main() {
     )
 
     if (!SITE_URL.startsWith('https://')) {
-        console.warn('[sitemap] SITE_URL is not https — search engines expect absolute https URLs.')
+        console.warn('[sitemap] SITE_URL is not https; search engines expect absolute https URLs.')
     }
 }
 

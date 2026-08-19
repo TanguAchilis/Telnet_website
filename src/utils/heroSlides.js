@@ -11,5 +11,5 @@ export const HERO_SLIDE_IMAGES = [
     '/Our team/other images/laptop.jpg',
 ]
 
-/** The homepage LCP candidate — the only hero image needed for first paint. */
+/** The homepage LCP candidate: the only hero image needed for first paint. */
 export const HERO_FIRST_IMAGE = HERO_SLIDE_IMAGES[0]

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchGalleryCategories, fetchGalleryImages } from '../utils/content'
+import { Icon } from '../icons'
 import './Gallery.css'
 
 // Fallback content (used before the CMS migration is run / DB is empty).
@@ -141,10 +142,10 @@ export default function Gallery({ showHeader = true }) {
 
             {lightbox !== null && filtered[lightbox] && (
                 <div className="lightbox" onClick={() => setLightbox(null)}>
-                    <button className="lightbox-close" onClick={() => setLightbox(null)}>✕</button>
-                    <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + filtered.length) % filtered.length) }}>‹</button>
+                    <button className="lightbox-close" onClick={() => setLightbox(null)} aria-label="Close image"><Icon name="close" size={20} /></button>
+                    <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + filtered.length) % filtered.length) }} aria-label="Previous image"><Icon name="chevron-left" size={24} /></button>
                     <img src={filtered[lightbox].image_url} alt={filtered[lightbox].caption || ''} className="lightbox-image" onClick={(e) => e.stopPropagation()} />
-                    <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % filtered.length) }}>›</button>
+                    <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % filtered.length) }} aria-label="Next image"><Icon name="chevron-right" size={24} /></button>
                     <p className="lightbox-caption">{filtered[lightbox].caption}</p>
                 </div>
             )}

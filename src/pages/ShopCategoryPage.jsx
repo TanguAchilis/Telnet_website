@@ -7,6 +7,7 @@ import { breadcrumbSchema } from '../utils/structuredData'
 import { useJsonLd, useSeo } from '../utils/useSeo'
 import './PageBanner.css'
 import './ShopFlow.css'
+import { Icon } from '../icons'
 
 function slugToTitle(slug = '') {
     return slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -38,7 +39,7 @@ export default function ShopCategoryPage() {
     }, [categorySlug])
 
     const title = category?.name || slugToTitle(categorySlug)
-    const waMessage = `Hello Telnet Cameroon! I'm interested in your ${title} — could you share what's currently available and the prices?`
+    const waMessage = `Hello Telnet Cameroon! I'm interested in your ${title}. Could you share what's currently available and the prices?`
 
     useSeo(shopCategoryMeta(title, category?.description, `/shop/${categorySlug}`))
     useJsonLd(
@@ -76,7 +77,7 @@ export default function ShopCategoryPage() {
                                         {p.image_url ? (
                                             <img src={p.image_url} alt={p.name} loading="lazy" />
                                         ) : (
-                                            <span className="shopf-product-placeholder">🖼️</span>
+                                            <span className="shopf-product-placeholder"><Icon name="image" size={40} /></span>
                                         )}
                                         {!p.in_stock && <span className="shopf-badge shopf-badge-out">Out of stock</span>}
                                         {p.condition && <span className="shopf-badge shopf-badge-cond">{p.condition}</span>}
@@ -86,7 +87,7 @@ export default function ShopCategoryPage() {
                                         <h3 className="shopf-product-name">{p.name}</h3>
                                         <div className="shopf-product-foot">
                                             <span className="shopf-product-price">{formatPrice(p.price, p.price_note)}</span>
-                                            <span className="shopf-product-view">View →</span>
+                                            <span className="shopf-product-view">View<Icon name="arrow-right" size={14} /></span>
                                         </div>
                                     </div>
                                 </Link>
@@ -94,7 +95,7 @@ export default function ShopCategoryPage() {
                         </div>
                     ) : (
                         <div className="shopf-empty">
-                            <span className="shopf-empty-icon">🛍️</span>
+                            <span className="shopf-empty-icon"><Icon name="bag" size={34} /></span>
                             <h3>No items listed here yet</h3>
                             <p>We're updating this category. Message us on WhatsApp and we'll tell you exactly what's in stock.</p>
                             <a href={getWhatsAppUrl(waMessage)} target="_blank" rel="noopener noreferrer" className="btn btn-primary">

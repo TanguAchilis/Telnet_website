@@ -3,7 +3,7 @@
 --
 -- The stored value was 237672595150, which is now out of date. Every WhatsApp
 -- button on the site reads this field (navbar quote CTA, floating bubble, hero,
--- footer, services, shop, product enquiries, 404) — see src/utils/whatsapp.js.
+-- footer, services, shop, product enquiries, 404). See src/utils/whatsapp.js.
 --
 -- Digits only, no '+' or spaces: the value is interpolated straight into a
 -- wa.me URL, which rejects both.

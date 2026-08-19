@@ -5,6 +5,7 @@ import Modal from '../../components/admin/Modal'
 import ImageUpload from '../../components/admin/ImageUpload'
 import './admin.css'
 import './AdminCms.css'
+import { Icon } from '../../icons'
 
 function slugify(text) {
     return (text || '').toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
@@ -118,8 +119,8 @@ export default function AdminGallery() {
                         <div key={cat.id} className="acms-chip">
                             <span>{cat.name}</span>
                             <span className="acms-chip-count">{images.filter((i) => i.category_id === cat.id).length}</span>
-                            <button className="acms-chip-edit" onClick={() => { setModalError(''); setCatModal(cat) }} title="Edit">✎</button>
-                            <button className="acms-chip-del" onClick={() => removeCategory(cat)} title="Delete">✕</button>
+                            <button className="acms-chip-edit" onClick={() => { setModalError(''); setCatModal(cat) }} title="Edit" aria-label="Edit category"><Icon name="pencil" size={13} weight={2} /></button>
+                            <button className="acms-chip-del" onClick={() => removeCategory(cat)} title="Delete" aria-label="Delete category"><Icon name="trash" size={13} weight={2} /></button>
                         </div>
                     ))}
                     {categories.length === 0 && <p className="ap-table-muted">No categories yet.</p>}

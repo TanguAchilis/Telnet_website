@@ -7,6 +7,7 @@ import {
 } from '../../utils/admin'
 import './admin.css'
 import './AdminUsers.css'
+import { Icon } from '../../icons'
 
 const emptyProfile = {
     id: '',
@@ -162,9 +163,9 @@ export default function AdminUsers() {
                                                 {p.id === profile.id && <span className="ausers-self-pill">You</span>}
                                             </td>
                                             <td className="ap-table-muted">{p.email}</td>
-                                            <td className="ap-table-muted">{p.phone || '—'}</td>
+                                            <td className="ap-table-muted">{p.phone || '-'}</td>
                                             <td className="ap-table-muted">
-                                                {p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}
+                                                {p.created_at ? new Date(p.created_at).toLocaleDateString() : '-'}
                                             </td>
                                         </tr>
                                     ))}
@@ -246,9 +247,7 @@ export default function AdminUsers() {
                         <p className="ap-card-title">Add Admin User</p>
 
                         <div className="ausers-note">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                            </svg>
+                            <Icon name="info" size={16} weight={1.9} />
                             <p>
                                 This calls an Edge Function to create the user and assign the admin role.
                                 Make sure the function is deployed: <code>supabase functions deploy create-admin-user</code>

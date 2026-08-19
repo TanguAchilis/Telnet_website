@@ -18,7 +18,7 @@ import ContactPage from './pages/ContactPage'
 import InternshipPage from './pages/InternshipPage'
 import NotFoundPage from './pages/NotFoundPage'
 import WhatsAppFloat from './components/WhatsAppFloat'
-// Admin — lazily loaded so the CMS doesn't ship in the public bundle.
+// Admin routes, lazily loaded so the CMS doesn't ship in the public bundle.
 // A customer browsing laptops has no reason to download the admin panel.
 const AdminGuard = lazy(() => import('./components/admin/AdminGuard'))
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
@@ -74,7 +74,7 @@ function AnimationObserver() {
 
 function PublicLayout() {
   // Covers the eight static public routes. Shop category/product and the 404
-  // page set their own metadata — see useStaticRouteSeo.
+  // page set their own metadata. See useStaticRouteSeo.
   useStaticRouteSeo()
   // Drives every WhatsApp link and the LocalBusiness phone/email/hours, so both
   // follow Admin → Content → Contact Details rather than hardcoded constants.
@@ -131,12 +131,12 @@ function App() {
           <Route path="/shop/:categorySlug/:productId" element={<ShopProductPage />} />
           <Route path="/internship" element={<InternshipPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          {/* Unknown URLs previously rendered nothing at all — a blank page
+          {/* Unknown URLs previously rendered nothing at all: a blank page
               with a 200. Keep this last so it only catches real misses. */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* Admin routes — no public layout, lazily loaded */}
+        {/* Admin routes: no public layout, lazily loaded */}
         <Route element={<AdminSuspense />}>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminGuard />}>

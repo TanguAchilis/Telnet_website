@@ -1,7 +1,7 @@
 // JSON-LD builders.
 //
 // Kept free of React so scripts/prerender.js can emit the sitewide graph into
-// the static HTML — otherwise only JS-executing crawlers would ever see it.
+// the static HTML; otherwise only JS-executing crawlers would ever see it.
 //
 // Every field here maps to something that genuinely exists on the page or in
 // the database. Deliberately absent: aggregateRating (no reviews exist), geo
@@ -28,7 +28,7 @@ function toSpec(slots) {
  * @param contact - the CMS `contact_info` record, when available. Its values
  * win over the constants in seo.js, which are only a fallback for a first run
  * against an empty database. Those constants had already drifted from the live
- * record — this was publishing a phone number and opening hours that no longer
+ * record, so this was publishing a phone number and opening hours that no longer
  * matched reality.
  */
 export function localBusinessSchema(contact) {
@@ -52,7 +52,7 @@ export function localBusinessSchema(contact) {
     }
 
     // Omitted entirely when the free-text hours field can't be parsed with
-    // confidence — no claim beats a wrong claim.
+    // confidence: no claim beats a wrong claim.
     const hours = contact?.hours ? parseOpeningHours(contact.hours) : BUSINESS.openingHours
     if (hours) schema.openingHoursSpecification = toSpec(hours)
 
@@ -94,8 +94,8 @@ export function breadcrumbSchema(trail) {
 }
 
 /**
- * Product schema. `offers` is included only when a real numeric price exists —
- * most items in this catalogue are "Contact for price", and emitting an offer
+ * Product schema. `offers` is included only when a real numeric price exists.
+ * Most items in this catalogue are "Contact for price", and emitting an offer
  * with no price would be invalid markup.
  */
 export function productSchema(product, categoryName, pathname) {
@@ -120,7 +120,7 @@ export function productSchema(product, categoryName, pathname) {
         schema.offers = {
             '@type': 'Offer',
             price: String(price),
-            priceCurrency: 'XAF', // Central African CFA franc — displayed as FCFA.
+            priceCurrency: 'XAF', // Central African CFA franc, displayed as FCFA.
             availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
             url: canonicalFor(pathname),
             seller: { '@id': BUSINESS_ID },
